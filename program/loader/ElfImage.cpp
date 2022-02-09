@@ -1,6 +1,6 @@
 #include "ElfImage.h"
 // #include "util/utils.h"
-#include "../util/intmath.h"
+#include "util/intmath.h"
 // #include "inc/codeobject_util.h"
 #include <gelf.h>
 #include <errno.h>

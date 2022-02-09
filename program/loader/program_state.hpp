@@ -39,7 +39,7 @@ THE SOFTWARE.
 #endif
 
 // TODO schi change
-#include "kernel_code.h"
+// #include "kernel_code.h"
 // #include <inc/pps.h>
 // #include <inc/pps_ext.h>
 // #include <inc/pps_ven_loader.h>

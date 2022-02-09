@@ -1,6 +1,6 @@
 #include "Executable.h"
 #include "CodeObject.h"
-#include "codeobjectUtil.h"
+#include "CodeObjectUtil.h"
 // #include "common/options.h"
 #include "ElfDefine.h"
 // #include "inc/pps_kernel_code.h"
@@ -16,6 +16,8 @@
 
 // using namespace hcs;
 // using namespace hcs::common;
+
+#define  ISA_ALIGN_BYTES 16
 
 namespace loader {
 

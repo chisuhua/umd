@@ -9,7 +9,7 @@
 #include "elfio/elfio.hpp"
 #include "ElfDefine.h"
 #include "msgpack.hpp"
-#include "../util/hashstring.h"
+#include "util/hashstring.h"
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>

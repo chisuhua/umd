@@ -13,7 +13,7 @@
 // #include "inc/pps_elf.h"
 // #include "inc/drive_api.h"
 #include "loader_api.h"
-#include "kernel_code.h"
+//#include "kernel_code.h"
 // #include "inc/pps_ext_finalize.h"
 
 #define hsa_error(e) static_cast<status_t>(e)
@@ -35,23 +35,23 @@ std::string HsaVariableSegmentToString(hsa_variable_segment_t segment);
 std::string HsaProfileToString(profile_t profile);
 // std::string HsaMachineModelToString(hsa_machine_model_t model);
 std::string HsaFloatRoundingModeToString(hsa_default_float_rounding_mode_t mode);
-std::string HcsMachineKindToString(machine_kind16_t machine);
-std::string AmdFloatRoundModeToString(amd_float_round_mode_t round_mode);
-std::string AmdFloatDenormModeToString(amd_float_denorm_mode_t denorm_mode);
-std::string AmdSystemVgprWorkitemIdToString(amd_system_vgpr_workitem_id_t system_vgpr_workitem_id);
-std::string AmdElementByteSizeToString(amd_element_byte_size_t element_byte_size);
-std::string AmdExceptionKindToString(amd_exception_kind16_t exceptions);
-std::string AmdPowerTwoToString(powertwo8_t p);
+// std::string HcsMachineKindToString(machine_kind16_t machine);
+// std::string AmdFloatRoundModeToString(amd_float_round_mode_t round_mode);
+// std::string AmdFloatDenormModeToString(amd_float_denorm_mode_t denorm_mode);
+// std::string AmdSystemVgprWorkitemIdToString(amd_system_vgpr_workitem_id_t system_vgpr_workitem_id);
+// std::string AmdElementByteSizeToString(amd_element_byte_size_t element_byte_size);
+// std::string AmdExceptionKindToString(amd_exception_kind16_t exceptions);
+// std::string AmdPowerTwoToString(powertwo8_t p);
 amdgpu_hsa_elf_segment_t HcsElfSectionSegment(amdgpu_hsa_elf_section_t sec);
 bool IsHcsElfSectionROData(amdgpu_hsa_elf_section_t sec);
 std::string ElfSegmentToString(amdgpu_hsa_elf_segment_t seg);
 std::string AmdPTLoadToString(uint64_t type);
 
-void PrintAmdKernelCode(std::ostream& out, const kernel_code_t *akc);
+// void PrintAmdKernelCode(std::ostream& out, const kernel_code_t *akc);
 // void PrintAmdComputePgmRsrcOne(std::ostream& out, amd_compute_pgm_rsrc_one32_t compute_pgm_rsrc1);
 // void PrintAmdComputePgmRsrcTwo(std::ostream& out, amd_compute_pgm_rsrc_two32_t compute_pgm_rsrc2);
-void PrintAmdKernelCodeProperties(std::ostream& out, kernel_code_properties32_t kernel_code_properties);
-void PrintAmdControlDirectives(std::ostream& out, const amd_control_directives_t &control_directives);
+// void PrintAmdKernelCodeProperties(std::ostream& out, kernel_code_properties32_t kernel_code_properties);
+// void PrintAmdControlDirectives(std::ostream& out, const amd_control_directives_t &control_directives);
 
 namespace code_options {
   // Space between options (not at the beginning).

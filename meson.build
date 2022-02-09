@@ -60,7 +60,6 @@ message('CUDA_INSTALL_PATH is ' + CUDA_INSTALL_PATH)
 #umd_link_args = link_args + ['-Wl,--version-script='+model_symbol_list]
 umd_link_args = link_args
 umd_inc = [
-  'program/loader/inc',
   'program/loader',
   'program/.',
   '../3rdparty/msgpack-c/include',
