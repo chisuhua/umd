@@ -10,6 +10,7 @@ class Umd;
 class IMemRegion;
 class IAgent;
 class CUctx;
+class DispatchInfo;
 
 namespace loader {
     class Executable;
@@ -32,6 +33,15 @@ typedef status_t (*pfn_free_memregion)(CUctx* ctx, IMemRegion *region);
 
 struct UmdImpl {
 }
+#endif
+
+#if !defined(__VECTOR_TYPES_H__)
+/*
+struct dim3
+{
+    unsigned int x, y, z;
+};
+*/
 #endif
 
 class Umd {
@@ -76,6 +86,7 @@ public:
     virtual IMemRegion* get_system_memregion() = 0;
     virtual IMemRegion* get_device_memregion(IAgent* agent) = 0;
     virtual status_t free_memregion(IMemRegion *region) = 0;
-    loader::Executable* load_program(const std::string& file, CUctx* ctx, IAgent* agent = nullptr);
+    loader::Executable* load_program(const std::string& file);
+    void set_kernel_disp(const std::string& kernel_name, loader::Executable* exec, DispatchInfo* disp_info, struct dim3 gridDim, struct dim3 blockDim, uint64_t param_addr);
 };
 

@@ -1,4 +1,6 @@
 #include "../../libcuda/CUctx.h"
+#include "../../libcuda/abstract_hardware_model.h"
+#include "../../libcuda/gpu-sim.h"
 #include "UmdCuda.h"
 
 class Umd* get_umd(CUctx* ctx) {
@@ -20,6 +22,7 @@ status_t UmdCuda::memory_deregister(void* address, size_t size) {
 }
 
 status_t UmdCuda::memory_allocate(size_t size, void** ptr, IMemRegion *region) {
+  m_ctx->get_device()->get_gpgpu()->gpu_malloc(size);
   return SUCCESS;
 }
 
