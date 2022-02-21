@@ -57,8 +57,8 @@ message('DESIGN_ROOT is ' + DESIGN_ROOT)
 message('GEM5_ROOT is ' + GEM5_ROOT)
 message('CUDA_INSTALL_PATH is ' + CUDA_INSTALL_PATH)
 
-#umd_link_args = link_args + ['-Wl,--version-script='+model_symbol_list]
-umd_link_args = link_args + ['-L' + meson.current_build_dir() + '/../../../libcuda', '-lcudart']
+umd_link_args = link_args + ['-Wl,--version-script='+model_symbol_list]
+#umd_link_args = link_args + ['-L' + meson.current_build_dir() + '/../../../libcuda', '-lcudart']
 umd_inc = [
   'program/loader',
   'program/.',
@@ -90,6 +90,7 @@ umd = shared_library(
   link_args : umd_link_args,
   )
 
+umdcuda_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
 umdcuda_inc = [
   '../3rdparty/msgpack-c/include',
   DESIGN_ROOT + '/opu/coasm',
@@ -107,7 +108,7 @@ umdcuda = shared_library(
   include_directories : include_directories(umdcuda_inc),
   install : false,
   cpp_args : extra_cpp_args,
-  link_args : umd_link_args,
+  link_args : umdcuda_link_args,
   )
 
 #test_simple_src = [

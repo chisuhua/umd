@@ -1,0 +1,6 @@
+libumd.so {
+global:*;
+};
+libumdcuda.so {
+global:*;
+};

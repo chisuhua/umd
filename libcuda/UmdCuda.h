@@ -1,10 +1,11 @@
 #include "../Umd.h"
+#include "../IPlatform.h"
 
 
-class UmdCuda : public Umd {
+class UmdCuda : public IPlatform {
 public:
-    UmdCuda(CUctx *ctx) : Umd(ctx) {
-    }
+    UmdCuda() { }
+    ~UmdCuda() = default;
 
     status_t memory_register(void* address, size_t size);
     status_t memory_deregister(void* address, size_t size);

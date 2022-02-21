@@ -1,4 +1,5 @@
 #include "Umd.h"
+#include "IPlatform.h"
 #include "../../libcuda/CUctx.h"
 #include "KernelDispInfo.h"
 #include "program/Program.h"
@@ -31,19 +32,19 @@ void Umd::set_kernel_disp(const std::string& kernel_name, loader::Executable* ex
 }
 
 status_t Umd::memory_register(void* address, size_t size) {
-    assert(false);
+    return m_platform->memory_register(address, size);
 }
 
 status_t Umd::memory_deregister(void* address, size_t size) {
-    assert(false);
+    return m_platform->memory_deregister(address, size);
 }
 
 status_t Umd::memory_allocate(size_t size, void** ptr, IMemRegion *region) {
-    assert(false);
+    return m_platform->memory_allocate(size, ptr, region);
 }
 
 status_t Umd::memory_free(void* ptr) {
-    assert(false);
+    return m_platform->memory_free(ptr);
 }
 
 /*
@@ -53,13 +54,13 @@ status_t Umd::memory_copy(void* ptr) {
 */
 
 IMemRegion* Umd::get_system_memregion() {
-    assert(false);
+    return m_platform->get_system_memregion();
 }
 
 IMemRegion* Umd::get_device_memregion(IAgent* agent) {
-    assert(false);
+    return m_platform->get_device_memregion(agent);
 }
 
 status_t Umd::free_memregion(IMemRegion *region) {
-    assert(false);
+    return m_platform->free_memregion(region);
 }

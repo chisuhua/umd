@@ -3,9 +3,9 @@
 #include "../../libcuda/gpu-sim.h"
 #include "UmdCuda.h"
 
-class Umd* get_umd(CUctx* ctx) {
-  class Umd* umd = new UmdCuda(ctx);
-  return umd;
+extern "C" IPlatform* create_platform() {
+  IPlatform* platform = new UmdCuda();
+  return platform;
 };
 
 
@@ -22,7 +22,7 @@ status_t UmdCuda::memory_deregister(void* address, size_t size) {
 }
 
 status_t UmdCuda::memory_allocate(size_t size, void** ptr, IMemRegion *region) {
-  m_ctx->get_device()->get_gpgpu()->gpu_malloc(size);
+  *ptr = m_ctx->get_device()->get_gpgpu()->gpu_malloc(size);
   return SUCCESS;
 }
 
