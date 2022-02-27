@@ -9,7 +9,7 @@
 #include "elfio/elfio.hpp"
 #include "ElfDefine.h"
 #include "msgpack.hpp"
-#include "util/hashstring.h"
+#include "utils/hashstring.h"
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
@@ -19,6 +19,8 @@
 #ifndef _WIN32
 #define _alloca alloca
 #endif
+
+using namespace ELFIO;
 
 namespace code {
 
@@ -1082,8 +1084,8 @@ namespace code {
         return reinterpret_cast<SymbolV3*>(s.handle);
     }
 
-    // KernelSymbolV3::KernelSymbolV3(std::unique_ptr<hip_impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta)
-    KernelSymbolV3::KernelSymbolV3(hip_impl::Symbol elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta)
+    // KernelSymbolV3::KernelSymbolV3(std::unique_ptr<impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta)
+    KernelSymbolV3::KernelSymbolV3(impl::Symbol elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta)
         : SymbolV3(std::move(elfsym_), elf_reader)
         , kernarg_segment_size(0)
         , kernarg_segment_alignment(0)
@@ -1293,7 +1295,7 @@ namespace code {
         // Print(out);
 
         // use functon from program_state.hpp
-        auto note_section = hip_impl::find_section_if(elf_reader, [](const ELFIO::section* x) {
+        auto note_section = impl::find_section_if(elf_reader, [](const ELFIO::section* x) {
             return x->get_type() == SHT_NOTE;
         });
 
@@ -1314,7 +1316,7 @@ namespace code {
             }
         }
 
-        auto symbol_section = hip_impl::find_section_if(elf_reader, [](const ELFIO::section* x) {
+        auto symbol_section = impl::find_section_if(elf_reader, [](const ELFIO::section* x) {
             return x->get_type() == SHT_SYMTAB;
         });
 
@@ -1322,19 +1324,19 @@ namespace code {
         ELFIO::symbol_section_accessor symtab(elf_reader, symbol_section);
 
         // build up all function name symbol map
-        std::map<std::string, hip_impl::Symbol> function_symbol;
+        std::map<std::string, impl::Symbol> function_symbol;
         for (auto i = 0u; i != symtab.get_symbols_num(); ++i) {
-            auto tmp = hip_impl::read_symbol(symtab, i);
+            auto tmp = impl::read_symbol(symtab, i);
             if (tmp.type == STT_FUNC && tmp.sect_idx != SHN_UNDEF && !tmp.name.empty()) {
                 function_symbol.insert(std::make_pair(tmp.name, tmp));
             }
         }
 
         for (auto i = 0u; i != symtab.get_symbols_num(); ++i) {
-            hip_impl::Symbol s = hip_impl::read_symbol(symtab, i);
+            impl::Symbol s = impl::read_symbol(symtab, i);
 
             SymbolV3* sym { nullptr };
-            // auto symbol = std::make_unique<hip_impl::Symbol>(s);
+            // auto symbol = std::make_unique<impl::Symbol>(s);
             std::shared_ptr<KernelMeta> pMeta = findKernelBySymbol(s.name);
 
             switch (s.type) {
@@ -1357,7 +1359,7 @@ namespace code {
                     memcpy(&akc, sec->get_data() + offset, sizeof(akc));
                     */
                     if (function_symbol.find(pMeta->name) != function_symbol.end()) {
-                        // sym = new KernelSymbolV3(std::make_unique<hip_impl::Symbol>(function_symbol[pMeta->name]), elf_reader, pMeta.get());
+                        // sym = new KernelSymbolV3(std::make_unique<impl::Symbol>(function_symbol[pMeta->name]), elf_reader, pMeta.get());
                         // sym = new KernelSymbolV3(function_symbol[pMeta->name], elf_reader, pMeta.get());
                         sym = new KernelSymbolV3(std::move(s), elf_reader, pMeta.get());
                     } else {

@@ -2,7 +2,7 @@
 
 #include <map>
 #include <vector>
-#include "loader/CodeObject.h"
+// #include "loader/CodeObject.h"
 #include "loader/LoaderContext.h"
 #include "loader/Loader.h"
 // #include "util/utils.h"
@@ -16,7 +16,7 @@ public:
 
     LoaderContext* loader_context() { return loader_context_; }
 
-    code::CodeObjectManager* code_manager() { return &code_manager_; }
+    // code::CodeObjectManager* code_manager() { return &code_manager_; }
 
     Program(CUctx* ctx)
     {
@@ -51,7 +51,7 @@ protected:
     LoaderContext *loader_context_;
 
     // Code object manager.
-    code::CodeObjectManager code_manager_;
+    // code::CodeObjectManager code_manager_;
 
     // Holds reference count to program object.
     std::atomic<uint32_t> ref_count_;

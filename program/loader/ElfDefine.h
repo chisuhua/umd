@@ -5,15 +5,15 @@
 // #include "inc/pps_common.h"
 
 // ELF Header Enumeration Values.
-#define EM_AMDGPU                224
-#define ELFOSABI_AMDGPU_HSA      64
+// #define EM_AMDGPU                224
+// #define ELFOSABI_AMDGPU_HSA      64
 #define ELFABIVERSION_AMDGPU_HSA 0
-#define EF_AMDGPU_XNACK          0x00000001
-#define EF_AMDGPU_TRAP_HANDLER   0x00000002
+// #define EF_AMDGPU_XNACK          0x00000001
+// #define EF_AMDGPU_TRAP_HANDLER   0x00000002
 
 // FIXME: We really need to start thinking about separating legacy code out,
 // it is getting messy.
-#define EF_AMDGPU_XNACK_LC 0x100
+// #define EF_AMDGPU_XNACK_LC 0x100
 
 // ELF Section Header Flag Enumeration Values.
 #define SHF_AMDGPU_HSA_GLOBAL   (0x00100000 & SHF_MASKOS)
@@ -37,7 +37,7 @@ typedef enum {
 #define PT_AMDGPU_HSA_LOAD_CODE_AGENT     (PT_LOOS + AMDGPU_HSA_SEGMENT_CODE_AGENT)
 
 // ELF Symbol Type Enumeration Values.
-#define STT_AMDGPU_HSA_KERNEL            (STT_LOOS + 0)
+// #define STT_AMDGPU_HSA_KERNEL            (STT_LOOS + 0)
 #define STT_AMDGPU_HSA_INDIRECT_FUNCTION (STT_LOOS + 1)
 #define STT_AMDGPU_HSA_METADATA          (STT_LOOS + 2)
 
@@ -73,13 +73,13 @@ typedef enum {
 #define STF_AMDGPU_HSA_CONST AMDGPU_HSA_SYMBOL_FLAG_CONST
 
 // AMD GPU Relocation Type Enumeration Values.
-#define R_AMDGPU_NONE         0
-#define R_AMDGPU_32_LOW       1
-#define R_AMDGPU_32_HIGH      2
-#define R_AMDGPU_64           3
-#define R_AMDGPU_INIT_SAMPLER 4
-#define R_AMDGPU_INIT_IMAGE   5
-#define R_AMDGPU_RELATIVE64   13
+// #define R_AMDGPU_NONE         0
+// #define R_AMDGPU_32_LOW       1
+// #define R_AMDGPU_32_HIGH      2
+// #define R_AMDGPU_64           3
+// #define R_AMDGPU_INIT_SAMPLER 4
+// #define R_AMDGPU_INIT_IMAGE   5
+// #define R_AMDGPU_RELATIVE64   13
 
 // AMD GPU Note Type Enumeration Values.
 #define NT_AMDGPU_HSA_CODE_OBJECT_VERSION 1

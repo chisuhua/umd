@@ -15,7 +15,7 @@
 #include "Loader.h"
 #include "locker.h"
 // #include "inc/pps_kernel_code.h"
-#include "util/locks.h"
+#include "utils/locks.h"
 #include "elfio/elfio.hpp"
 // #include "iguana/msgpack.hpp"
 

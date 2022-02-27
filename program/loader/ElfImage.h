@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include "Elf.h"
+// #include "utils/elfdefinitions.h"
 
   namespace elf {
     class Symbol;

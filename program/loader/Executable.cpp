@@ -10,12 +10,13 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <libelf.h>
+// #include <libelf.h>
 
 // #include "elfio/elfio.hpp"
 
 // using namespace hcs;
 // using namespace hcs::common;
+using namespace ELFIO;
 
 #define  ISA_ALIGN_BYTES 16
 

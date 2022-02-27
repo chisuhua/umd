@@ -1,8 +1,8 @@
 #include "ElfImage.h"
 // #include "util/utils.h"
-#include "util/intmath.h"
+#include "utils/intmath.h"
 // #include "inc/codeobject_util.h"
-#include <gelf.h>
+// #include <gelf.h>
 #include <errno.h>
 #include <cstring>
 #include <cerrno>
@@ -15,7 +15,7 @@
 #include <Windows.h>
 #define alignof __alignof
 #endif // _WIN32
-#include <libelf.h>
+// #include <libelf.h>
 
 #ifndef _WIN32
 #define _open open
@@ -24,6 +24,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #endif
+#include "utils/elfdefinitions.h"
+#include "loader/Elf.h"
 
 #if defined(USE_MEMFILE)
 
@@ -742,7 +744,7 @@ namespace ppu {
       FileImage img;
       const char* buffer;
       size_t bufferSize;
-      Elf* e;
+      co::Elf* e;
       GElf_Ehdr ehdr;
       GElfStringTable* shstrtabSection;
       GElfStringTable* strtabSection;
@@ -753,7 +755,7 @@ namespace ppu {
 
       bool imgError();
       const char *elfError();
-      bool elfBegin(Elf_Cmd cmd);
+      // bool elfBegin(Elf_Cmd cmd);
       bool elfEnd();
       bool push0();
       bool pullElf();
@@ -833,13 +835,13 @@ namespace ppu {
         phdr.p_filesz += (section->type() == SHT_NOBITS) ? 0 : section->size();
         phdr.p_memsz += section->memSize();
       }
-      if (!gelf_update_phdr(elf->e, index, &phdr)) { return elf->elfError("gelf_update_phdr failed"); }
+      // FIXME if (!gelf_update_phdr(elf->e, index, &phdr)) { return elf->elfError("gelf_update_phdr failed"); }
       return true;
     }
 
     bool GElfSegment::pull()
     {
-      if (!gelf_getphdr(elf->e, index, &phdr)) { return elf->elfError("gelf_getphdr failed"); }
+      // FIXME if (!gelf_getphdr(elf->e, index, &phdr)) { return elf->elfError("gelf_getphdr failed"); }
       return true;
     }
 
@@ -875,16 +877,32 @@ namespace ppu {
 
     bool GElfSection::updateAddr(uint64_t addr)
     {
+      ELFIO::section* sec = elf->e->_elfio.sections[ndxscn];
+      assert(sec != nullptr);
+      sec->set_address(addr);
+      /*
       Elf_Scn *scn = elf_getscn(elf->e, ndxscn);
       assert(scn);
       if (!gelf_getshdr(scn, &hdr)) { return elf->elfError("gelf_get_shdr failed"); }
       hdr.sh_addr = addr;
       if (!gelf_update_shdr(scn, &hdr)) { return elf->elfError("gelf_update_shdr failed"); }
+      */
       return true;
     }
 
     bool GElfSection::push(const char* name, uint32_t shtype, uint64_t shflags, uint16_t shlink, uint32_t info, uint32_t align, uint64_t entsize)
     {
+      ELFIO::section* sec = elf->e->_elfio.sections[ndxscn];
+      if (sec == nullptr) { return false;}
+      align = (std::max)(align, (uint32_t)8);
+      sec->set_type(shtype);
+      sec->set_flags(shflags);
+      sec->set_link(shlink);
+      sec->set_info(info);
+      sec->set_addr_align(align);
+      sec->set_entry_size(entsize);
+      return true;
+      /*
       Elf_Scn *scn = elf_newscn(elf->e);
       if (!scn) { return false; }
       ndxscn = elf_ndxscn(scn);
@@ -899,14 +917,26 @@ namespace ppu {
       hdr.sh_addralign = align;
       hdr.sh_entsize = entsize;
       if (!gelf_update_shdr(scn, &hdr)) { return elf->elfError("gelf_update_shdr failed"); }
+      */
       return true;
     }
 
     bool GElfSection::pull0()
     {
+      ELFIO::section *sec = elf->e->_elfio.sections[ndxscn];
+      if (sec == nullptr) {return false;}
+      hdr.sh_name = sec->get_name_string_offset();
+      hdr.sh_type = sec->get_type();
+      hdr.sh_flags = sec->get_flags();
+      hdr.sh_link = sec->get_link();
+      hdr.sh_info = sec->get_info();
+      hdr.sh_addralign = sec->get_addr_align();
+      hdr.sh_entsize = sec->get_entry_size();
+      /*
       Elf_Scn *scn = elf_getscn(elf->e, ndxscn);
       if (!scn) { return false; }
       if (!gelf_getshdr(scn, &hdr)) { return elf->elfError("gelf_get_shdr failed"); }
+      */
       return true;
     }
 
@@ -914,11 +944,16 @@ namespace ppu {
     {
       ndxscn = (size_t) ndx;
       if (!pull0()) { return false; }
+      /*
       Elf_Scn *scn = elf_getscn(elf->e, ndx);
       if (!scn) { return false; }
       Elf_Data *edata0 = elf_getdata(scn, NULL);
+      */
+      ELFIO::section* sec = elf->e->_elfio.sections[ndx];
+      if (!sec) { return false;}
+      const char* edata0 = sec->get_data();
       if (edata0) {
-        data0 = Buffer((const Buffer::byte_type*)edata0->d_buf, edata0->d_size, edata0->d_align);
+        data0 = Buffer((const Buffer::byte_type*)edata0, sec->get_size(), sec->get_addr_align());
       }
       seg = elf->segmentByVAddr(hdr.sh_addr);
       return true;
@@ -926,24 +961,28 @@ namespace ppu {
 
     bool GElfSection::push()
     {
+      ELFIO::section* sec = elf->e->_elfio.sections[ndxscn];
+      assert(sec != nullptr);
+      /*
       Elf_Scn *scn = elf_getscn(elf->e, ndxscn);
       assert(scn);
       Elf_Data *edata = nullptr;
       edata = elf_newdata(scn);
       if (!edata) { return elf->elfError("elf_newdata failed"); }
+      */
       if (hdr.sh_type == SHT_NOBITS) {
-        edata->d_buf = 0;
-        edata->d_size = memsize_;
+        sec->set_data(0, data.size());
         if (align_ != 0) {
-          edata->d_align = align_;
+          sec->set_addr_align((std::max)(align_, (uint64_t)8));
         }
       } else {
-        edata->d_buf = (void*)data.raw();
-        edata->d_size = data.size();
+        sec->set_data((const char*)data.raw(), data.size());
+        sec->set_size(data.size());
         if (data.align() != 0) {
-          edata->d_align = data.align();
+          sec->set_addr_align((std::max)(data.align(), (uint64_t)8));
         }
       }
+      /*
       edata->d_align = (std::max)(edata->d_align, (uint64_t) 8);
       switch (hdr.sh_type) {
       case SHT_RELA:
@@ -961,6 +1000,7 @@ namespace ppu {
       hdr.sh_size = edata->d_size;
       hdr.sh_addralign = edata->d_align;
       if (!gelf_update_shdr(scn, &hdr)) { return elf->elfError("gelf_update_shdr failed"); }
+      */
       return true;
     }
 
@@ -976,6 +1016,23 @@ namespace ppu {
 
     bool GElfSection::getData(uint64_t offset, void* dest, uint64_t size)
     {
+      ELFIO::section* sec = elf->e->_elfio.sections[ndxscn];
+      assert(sec != nullptr);
+      const char* data = sec->get_data();
+      uint64_t dsize = sec->get_size();
+      uint64_t coffset = 0;
+      uint64_t csize = 0;
+      if (data != nullptr) {
+        if (coffset <= offset && offset <= coffset + dsize) {
+          csize = (std::min)(size, dsize - offset);
+          memcpy(dest, (const char*)data + offset - coffset, csize);
+          coffset += csize;
+          dest = (char*) dest + csize;
+          size -= csize;
+          if (!size) { return true;}
+        }
+      }
+      /*
       Elf_Data* edata = 0;
       uint64_t coffset = 0;
       uint64_t csize = 0;
@@ -991,6 +1048,7 @@ namespace ppu {
           if (!size) { return true; }
         }
       }
+      */
       return false;
     }
 
@@ -1185,6 +1243,30 @@ namespace ppu {
 
     bool GElfNoteSection::getNote(const std::string& name, uint32_t type, void** desc, uint32_t* desc_size)
     {
+      ELFIO::section* sec = elf->e->_elfio.sections[ndxscn];
+      if (sec == nullptr) {
+        return false;
+      }
+      // Initialize the size and buffer to invalid data points
+      *desc_size = 0;
+      *desc = nullptr;
+
+      ELFIO::note_section_accessor note_reader(elf->e->_elfio, sec);
+      auto num = note_reader.get_notes_num();
+      void* desc1 = nullptr;
+      Elf_Word desc_size1 = 0;
+
+      for (unsigned int i = 0; i < num; i++ ) {
+        std::string name1;
+        if (note_reader.get_note(i, type, name1, desc1, desc_size1)) {
+          if (name1 == name) {
+            *desc = static_cast<char *>(desc1);
+            *desc_size = desc_size1;
+            return true;
+          }
+        }
+      }
+      /*
       Elf_Data* data = 0;
       Elf_Scn *scn = elf_getscn(elf->e, ndxscn);
       assert(scn);
@@ -1204,6 +1286,7 @@ namespace ppu {
           note_offset += sizeof(Elf64_Nhdr) + alignUp(note->n_namesz, 4) + alignUp(note->n_descsz, 4);
         }
       }
+      */
       return false;
     }
 
@@ -1252,6 +1335,15 @@ namespace ppu {
     {
       section = elf->section(hdr.sh_info);
       symtab = elf->getSymtab(hdr.sh_link);
+      auto sec = elf->e->_elfio.sections[ndxscn];
+      assert(sec != nullptr);
+      const char *data = sec->get_data();
+      assert(data != nullptr);
+      data0 = Buffer((const Buffer::byte_type*)data, sec->get_size(), sec->get_addr_align());
+      for (size_t i = 0; i < data0.size() / sizeof(GElf_Rela); ++i) {
+        relocations.push_back(std::unique_ptr<GElfRelocation>(new GElfRelocation(this, data0, i * sizeof(GElf_Rela))));
+      }
+      /*
       Elf_Scn *lScn = elf_getscn(elf->e, ndxscn);
       assert(lScn);
       Elf_Data *lData = elf_getdata(lScn, nullptr);
@@ -1260,6 +1352,7 @@ namespace ppu {
       for (size_t i = 0; i < data0.size() / sizeof(GElf_Rela); ++i) {
         relocations.push_back(std::unique_ptr<GElfRelocation>(new GElfRelocation(this, data0, i * sizeof(GElf_Rela))));
       }
+      */
       return true;
     }
 
@@ -1272,14 +1365,15 @@ namespace ppu {
         symtabSection(0),
         noteSection(0)
     {
-      if (EV_NONE == elf_version(EV_CURRENT)) {
+      if (EV_NONE == e->_elfio.get_elf_version()) {
         assert(false);
       }
     }
 
     GElfImage::~GElfImage()
     {
-      elf_end(e);
+      // elf_end(e);
+      free(e);
     }
 
     bool GElfImage::imgError()
@@ -1290,9 +1384,10 @@ namespace ppu {
 
     const char *GElfImage::elfError()
     {
-      return elf_errmsg(-1);
+      // return elf_errmsg(-1);
+      return "elf_errmsg";
     }
-
+/*
     bool GElfImage::elfBegin(Elf_Cmd cmd)
     {
       if ((e = elf_begin(img.fd(), cmd, NULL
@@ -1305,11 +1400,18 @@ namespace ppu {
       }
       return true;
     }
-
+*/
     bool GElfImage::initNew(uint16_t machine, uint16_t type, uint8_t os_abi, uint8_t abi_version, uint32_t e_flags)
     {
-      if (!img.create()) { return imgError(); }
-      if (!elfBegin(ELF_C_WRITE)) { return false; }
+      // if (!img.create()) { return imgError(); }
+      // if (!elfBegin(ELF_C_WRITE)) { return false; }
+      e = new co::Elf(elfclass, nullptr, 0, nullptr, co::Elf::ELF_C_RDWR);
+      e->_elfio.set_os_abi(os_abi);
+      e->_elfio.set_abi_version(abi_version);
+      e->_elfio.set_machine(machine);
+      e->_elfio.set_type(type);
+      e->_elfio.set_flags(e_flags);
+      /*
       if (!gelf_newehdr(e, elfclass)) { return elfError("gelf_newehdr failed"); }
       if (!gelf_getehdr(e, &ehdr)) { return elfError("gelf_getehdr failed"); }
       ehdr.e_ident[EI_DATA] = ELFDATA2LSB;
@@ -1321,10 +1423,12 @@ namespace ppu {
       ehdr.e_version = EV_CURRENT;
       ehdr.e_flags = e_flags;
       if (!gelf_update_ehdr(e, &ehdr)) { return elfError("gelf_updateehdr failed"); }
+      */
       sections.push_back(std::unique_ptr<GElfSection>());
       if (!shstrtab()->push(".shstrtab", SHT_STRTAB, SHF_STRINGS)) { return elfError("Failed to create shstrtab"); }
-      ehdr.e_shstrndx = shstrtab()->getSectionIndex();
-      if (!gelf_update_ehdr(e, &ehdr)) { return elfError("gelf_updateehdr failed"); }
+      // FIXME
+      // ehdr.e_shstrndx = shstrtab()->getSectionIndex();
+      // if (!gelf_update_ehdr(e, &ehdr)) { return elfError("gelf_updateehdr failed"); }
       if (!strtab()->push(".strtab", SHT_STRTAB, SHF_STRINGS)) { return elfError("Failed to create strtab"); }
       frozen = false;
       return true;
@@ -1332,9 +1436,10 @@ namespace ppu {
 
     bool GElfImage::loadFromFile(const std::string& filename)
     {
-      if (!img.create()) { return imgError(); }
-      if (!img.readFrom(filename)) { return imgError(); }
-      if (!elfBegin(ELF_C_RDWR)) { return false; }
+      // if (!img.create()) { return imgError(); }
+      // if (!img.readFrom(filename)) { return imgError(); }
+      // if (!elfBegin(ELF_C_RDWR)) { return false; }
+      e = new co::Elf(elfclass, nullptr, 0, filename.c_str(), co::Elf::ELF_C_READ);
       return pullElf();
     }
 
@@ -1347,22 +1452,26 @@ namespace ppu {
         return !out.fail();
       } else {
         if (!push()) { return false; }
-        return img.writeTo(filename);
+        // return img.writeTo(filename);
+        return e->_elfio.save(filename);
       }
     }
 
     bool GElfImage::initFromBuffer(const void* buffer, size_t size)
     {
       if (size == 0) { size = ElfSize(buffer); }
-      if (!img.create()) { return imgError(); }
-      if (!img.copyFrom(buffer, size)) { return imgError(); }
-      if (!elfBegin(ELF_C_RDWR)) { return false; }
+      // if (!img.create()) { return imgError(); }
+      // if (!img.copyFrom(buffer, size)) { return imgError(); }
+      // if (!elfBegin(ELF_C_RDWR)) { return false; }
+      e = new co::Elf(elfclass, (const char*)buffer, size, nullptr, co::Elf::ELF_C_RDWR);
       return pullElf();
     }
 
     bool GElfImage::initAsBuffer(const void* buffer, size_t size)
     {
       if (size == 0) { size = ElfSize(buffer); }
+      e = new co::Elf(elfclass, (const char*)buffer, size, nullptr, co::Elf::ELF_C_RDWR);
+      /*
       if ((e = elf_memory(reinterpret_cast<char*>(const_cast<void*>(buffer)), size
 #ifdef AMD_LIBELF
                        , NULL
@@ -1371,16 +1480,20 @@ namespace ppu {
         out << "elf_begin(buffer) failed: " << elfError() << std::endl;
         return false;
       }
+      */
       this->buffer = reinterpret_cast<const char*>(buffer);
       this->bufferSize = size;
-      return true;
+      //return true;
       // TODO schi pullElf is ran by CodeObject pullElf, which can choose V3 version
-      // return pullElf();
+      return pullElf();
     }
 
     bool GElfImage::pullElf()
     {
-      if (!gelf_getehdr(e, &ehdr)) { return elfError("gelf_getehdr failed"); }
+      //if (!gelf_getehdr(e, &ehdr)) { return elfError("gelf_getehdr failed"); }
+      ehdr.e_phnum = e->_elfio.segments.size();
+      ehdr.e_shnum = e->_elfio.sections.size();
+      ehdr.e_shstrndx = e->_elfio.get_section_name_str_index();
       segments.reserve(ehdr.e_phnum);
       for (size_t i = 0; i < ehdr.e_phnum; ++i) {
         GElfSegment* segment = new GElfSegment(this, i);
@@ -1390,15 +1503,18 @@ namespace ppu {
 
       shstrtabSection = new GElfStringTable(this);
       if (!shstrtabSection->pull(ehdr.e_shstrndx)) { return false; }
-      Elf_Scn* scn = 0;
+      // Elf_Scn* scn = 0;
+      ELFIO::section* sec;
       for (unsigned n = 0; n < ehdr.e_shnum; ++n) {
-        scn = elf_getscn(e, n);
+        // scn = elf_getscn(e, n);
+        sec = e->_elfio.sections[n];
         if (n == ehdr.e_shstrndx) {
           sections.push_back(std::unique_ptr<GElfSection>(shstrtabSection));
           continue;
         }
         GElf_Shdr shdr;
-        if (!gelf_getshdr(scn, &shdr)) { return elfError("Failed to get shdr"); }
+        shdr.sh_type = sec->get_type();
+        // if (!gelf_getshdr(scn, &shdr)) { return elfError("Failed to get shdr"); }
         GElfSection* section = 0;
         if (shdr.sh_type == SHT_NOTE) {
           section = new GElfNoteSection(this);
@@ -1442,6 +1558,7 @@ namespace ppu {
       }
 
       for (size_t i = 1; i < sections.size(); ++i) {
+        // if (i == ehdr.e_shstrndx || i == ehdr.e_shstrndx) { continue; }
         if (i == ehdr.e_shstrndx || i == ehdr.e_shstrndx) { continue; }
         std::unique_ptr<GElfSection>& section = sections[i];
         if (section->Name() == ".strtab") { strtabSection = static_cast<GElfStringTable*>(section.get()); }
@@ -1450,7 +1567,8 @@ namespace ppu {
       }
 
       size_t phnum;
-      if (elf_getphdrnum(e, &phnum) < 0) { return elfError("elf_getphdrnum failed"); }
+      phnum = e->_elfio.segments.size();
+      // if (elf_getphdrnum(e, &phnum) < 0) { return elfError("elf_getphdrnum failed"); }
       for (size_t i = 0; i < phnum; ++i) {
         segments.push_back(std::unique_ptr<GElfSegment>(new GElfSegment(this, i)));
         if (!segments[i]->pull()) { return false; }
@@ -1484,11 +1602,12 @@ namespace ppu {
       for (std::unique_ptr<GElfSection>& section : sections) {
         if (section && !section->pull0()) { return false; }
       }
-
+/*
       if (!segments.empty()) {
         if (!gelf_newphdr(e, segments.size())) { return elfError("gelf_newphdr failed"); }
       }
       if (elf_update(e, ELF_C_NULL) < 0) { return elfError("elf_update (1.1) failed"); }
+      */
       if (!segments.empty()) {
         for (std::unique_ptr<GElfSection>& section : sections) {
           // Update section offsets.
@@ -1506,7 +1625,7 @@ namespace ppu {
     bool GElfImage::push()
     {
       if (!push0()) { return false; }
-      if (elf_update(e, ELF_C_WRITE) < 0) { return elfError("elf_update (2) failed"); }
+      // if (elf_update(e, ELF_C_WRITE) < 0) { return elfError("elf_update (2) failed"); }
       return true;
     }
 

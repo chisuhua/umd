@@ -12,7 +12,9 @@
 #include <unordered_map>
 
 #include "elfio/elfio.hpp"
-#include "loader/program_state.hpp"
+#include "loader_api.h"
+#include "Program.h"
+#include "ProgramState.h"
 
 namespace common {
 
@@ -439,20 +441,20 @@ inline RelocationV3 read_relocation(const ELFIO::relocation_section_accessor& se
 
     RelocationV3 r;
     section.get_entry(
-        idx, r.offset, r.symbol, r.type, r.addend);
+        idx, r.offset, r.symbol, (unsigned char&)(r.type), r.addend);
 
     return r;
 }
 
 class SymbolV3 {
 protected:
-    // std::unique_ptr<hip_impl::Symbol> elfsym;
-    hip_impl::Symbol elfsym;
+    // std::unique_ptr<impl::Symbol> elfsym;
+    impl::Symbol elfsym;
     ELFIO::section* section;
 
 public:
-    // explicit SymbolV3(std::unique_ptr<hip_impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader)
-    explicit SymbolV3(hip_impl::Symbol elfsym_, const ELFIO::elfio& elf_reader)
+    // explicit SymbolV3(std::unique_ptr<impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader)
+    explicit SymbolV3(impl::Symbol elfsym_, const ELFIO::elfio& elf_reader)
         : elfsym(std::move(elfsym_))
     {
         section = elf_reader.sections[elfsym.sect_idx];
@@ -470,7 +472,7 @@ public:
         assert(false);
         return 0;
     }
-    // hip_impl::Symbol* elfSym() { return elfsym->get(); }
+    // impl::Symbol* elfSym() { return elfsym->get(); }
     std::string Name() const { return elfsym.name; }
     ELFIO::section* GetSection() { return section; }
     virtual uint64_t SectionOffset() const { return elfsym.value; }
@@ -507,8 +509,8 @@ public:
     bool is_dynamic_callstack;
 
 public:
-    // explicit KernelSymbolV3(std::unique_ptr<hip_impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta);
-    explicit KernelSymbolV3(hip_impl::Symbol elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta);
+    // explicit KernelSymbolV3(std::unique_ptr<impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta);
+    explicit KernelSymbolV3(impl::Symbol elfsym_, const ELFIO::elfio& elf_reader, KernelMeta* kmeta);
     bool IsKernelSymbol() const override { return true; }
     KernelSymbolV3* AsKernelSymbol() override { return this; }
     hsa_symbol_kind_t Kind() const override { return HSA_SYMBOL_KIND_KERNEL; }
@@ -525,8 +527,8 @@ public:
 
 class VariableSymbolV3 : public SymbolV3 {
 public:
-    // explicit VariableSymbolV3(std::unique_ptr<hip_impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader)
-    explicit VariableSymbolV3(hip_impl::Symbol elfsym_, const ELFIO::elfio& elf_reader)
+    // explicit VariableSymbolV3(std::unique_ptr<impl::Symbol> elfsym_, const ELFIO::elfio& elf_reader)
+    explicit VariableSymbolV3(impl::Symbol elfsym_, const ELFIO::elfio& elf_reader)
         : SymbolV3(std::move(elfsym_), elf_reader)
     {
     }

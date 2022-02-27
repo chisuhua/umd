@@ -31,8 +31,9 @@ extra_cpp_args = ['-Wall', '-std=c++17']
 
 if buildtype == 'release'
   extra_cpp_args += ['-O3', '-g', '-Wno-strict-aliasing', '-msse4.1', '-flto']
+else
+  extra_cpp_args += ['-O0', '-g', '-Wno-strict-aliasing', '-msse4.1']
 endif
-extra_cpp_args += ['-O0', '-g', '-Wno-strict-aliasing', '-msse4.1', '-flto']
 
 extra_c_args = extra_cpp_args
 
@@ -62,7 +63,10 @@ umd_link_args = link_args + ['-Wl,--version-script='+model_symbol_list]
 umd_inc = [
   'program/loader',
   'program/.',
+  '.',
+  'include',
   '../3rdparty/msgpack-c/include',
+  '../3rdparty/elfio',
   DESIGN_ROOT + '/opu/coasm',
   DESIGN_ROOT + '/libcuda',
   CUDA_INSTALL_PATH + '/include'
@@ -70,6 +74,7 @@ umd_inc = [
 
 umd_src = [
   #'loader_api.cc',
+  'program/loader/Elf.cpp',
   'program/loader/Executable.cpp',
   'program/loader/CodeObject.cpp',
   'program/loader/ElfImage.cpp',
@@ -77,8 +82,11 @@ umd_src = [
   'program/loader/LoaderContext.cpp',
   'program/locker.cc',
   'program/Program.cpp',
+  'program/ProgramState.cpp',
   'program/file_util.cpp',
-  'Umd.cc'
+  'Umd.cc',
+  'utils/debug.cpp',
+  'utils/flags.cpp'
   ]
 
 umd = shared_library(

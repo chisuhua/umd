@@ -23,8 +23,8 @@ build_dbg() {
 	cd build && meson .. && ninja $1 || exit 1
 }
 
-build_dbg() {
-	echo "in build_dbg $1"
+build_release() {
+	echo "in build_release $1"
 	make_dir $1
 	cd build && meson .. --buildtype release && ninja $1 || exit 1
 }
