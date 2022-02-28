@@ -20,8 +20,8 @@
 
 #if !defined(_WIN32) && !defined(__CYGWIN__)
 
-#include "os/os.hpp"
-#include "thread/thread.hpp"
+#include "utils/os/os.hpp"
+#include "utils/thread/thread.hpp"
 #include "utils/util.hpp"
 #include "utils/flags.hpp"
 
@@ -42,6 +42,7 @@
 
 #include <sys/prctl.h>
 
+#include "utils/elfdefinitions.h"
 #include <link.h>
 #include <time.h>
 #ifndef DT_GNU_HASH

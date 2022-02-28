@@ -211,10 +211,10 @@ protected:
 
     // void AddHcsNote(uint32_t type, const void* desc, uint32_t desc_size);
     template <typename S>
-    bool GetHcsNote(uint32_t type, S** desc)
+    bool GetOpuKernelNote(uint32_t type, S** desc)
     {
         uint32_t desc_size;
-        if (!img->note()->getNote("HCS", type, (void**)desc, &desc_size)) {
+        if (!img->note()->getNote("OPU.Kernel", type, (void**)desc, &desc_size)) {
             out << "Failed to find note, type: " << type << std::endl;
             return false;
         }

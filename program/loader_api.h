@@ -739,6 +739,7 @@ typedef struct hsa_code_symbol_s {
 
 typedef struct hsa_code_object_s {
   uint64_t handle;
+  uint64_t size;
 } hsa_code_object_t;
 
 // TODO: this struct should be completely gone once debugger designs/implements

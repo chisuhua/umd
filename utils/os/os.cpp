@@ -18,8 +18,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE. */
 
-#include "os/os.hpp"
-#include "thread/thread.hpp"
+#include "utils/os/os.hpp"
+#include "utils/thread/thread.hpp"
 
 #include <string>
 #include <cstring>

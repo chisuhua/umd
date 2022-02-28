@@ -1365,9 +1365,11 @@ namespace ppu {
         symtabSection(0),
         noteSection(0)
     {
+      /*
       if (EV_NONE == e->_elfio.get_elf_version()) {
         assert(false);
       }
+      */
     }
 
     GElfImage::~GElfImage()
@@ -1463,14 +1465,14 @@ namespace ppu {
       // if (!img.create()) { return imgError(); }
       // if (!img.copyFrom(buffer, size)) { return imgError(); }
       // if (!elfBegin(ELF_C_RDWR)) { return false; }
-      e = new co::Elf(elfclass, (const char*)buffer, size, nullptr, co::Elf::ELF_C_RDWR);
+      e = new co::Elf(elfclass, (const char*)buffer, size, nullptr, co::Elf::ELF_C_READ);
       return pullElf();
     }
 
     bool GElfImage::initAsBuffer(const void* buffer, size_t size)
     {
       if (size == 0) { size = ElfSize(buffer); }
-      e = new co::Elf(elfclass, (const char*)buffer, size, nullptr, co::Elf::ELF_C_RDWR);
+      e = new co::Elf(elfclass, (const char*)buffer, size, nullptr, co::Elf::ELF_C_READ);
       /*
       if ((e = elf_memory(reinterpret_cast<char*>(const_cast<void*>(buffer)), size
 #ifdef AMD_LIBELF

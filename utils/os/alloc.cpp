@@ -18,8 +18,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE. */
 
-#include "os/alloc.hpp"
-#include "os/os.hpp"
+#include "utils/os/alloc.hpp"
+#include "utils/os/os.hpp"
 #include "utils/util.hpp"
 
 #include <cstdlib>

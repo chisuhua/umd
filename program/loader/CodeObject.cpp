@@ -264,10 +264,10 @@ namespace code {
         if (!GetNoteCodeObjectVersion(&majorVersion, &minorVersion)) {
             // return false;
             // TODO schi
-            isV3 = true;
-            return PullElfV3();
+            assert(false);
         }
-        assert(false);
+        isV3 = true;
+        return PullElfV3();
         // return PullElfV2();
     }
 
@@ -378,7 +378,7 @@ namespace code {
     bool CodeObject::GetNoteCodeObjectVersion(uint32_t* major, uint32_t* minor)
     {
         amdgpu_hsa_note_code_object_version_t* desc;
-        if (!GetHcsNote(NT_AMDGPU_HSA_CODE_OBJECT_VERSION, &desc)) {
+        if (!GetOpuKernelNote(NT_AMDGPU_HSA_CODE_OBJECT_VERSION, &desc)) {
             return false;
         }
         *major = desc->major_version;
@@ -389,7 +389,7 @@ namespace code {
     bool CodeObject::GetNoteCodeObjectVersion(std::string& version)
     {
         amdgpu_hsa_note_code_object_version_t* desc;
-        if (!GetHcsNote(NT_AMDGPU_HSA_CODE_OBJECT_VERSION, &desc)) {
+        if (!GetOpuKernelNote(NT_AMDGPU_HSA_CODE_OBJECT_VERSION, &desc)) {
             return false;
         }
         version.clear();
@@ -1270,7 +1270,7 @@ namespace code {
                 dataSegmentsV3.push_back(seg);
                 auto vaddr = seg->get_virtual_address(); // TODO verify use get_address is right
                 auto mem_size = seg->get_memory_size(); // TODO verify use get_address is right
-                std::cout << "vaddr:" << std::hex << vaddr << "mem_size" << mem_size << std::endl;
+                std::cout << "vaddr:" << std::hex << vaddr << " mem_size:" << mem_size << std::endl;
             }
         }
 

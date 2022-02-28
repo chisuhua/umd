@@ -590,46 +590,7 @@ typedef Elf64_Sym GElf_Sym;
  * Syminfo descriptors, containing additional symbol information.
  */
 
-/* 32-bit entry. */
-typedef struct {
-	Elf32_Half	si_boundto;  /* Entry index with additional flags. */
-	Elf32_Half	si_flags;    /* Flags. */
-} Elf32_Syminfo;
-
-/* 64-bit entry. */
-typedef struct {
-	Elf64_Half	si_boundto;  /* Entry index with additional flags. */
-	Elf64_Half	si_flags;    /* Flags. */
-} Elf64_Syminfo;
-
-typedef Elf64_Syminfo GElf_Syminfo;
-
-/*
- * Relocation descriptors.
- */
-#if 0
-typedef struct {
-	Elf32_Addr	r_offset;    /* location to apply relocation to */
-	Elf32_Word	r_info;	     /* type+section for relocation */
-} Elf32_Rel;
-
-typedef struct {
-	Elf32_Addr	r_offset;    /* location to apply relocation to */
-	Elf32_Word	r_info;      /* type+section for relocation */
-	Elf32_Sword	r_addend;    /* constant addend */
-} Elf32_Rela;
-
-typedef struct {
-	Elf64_Addr	r_offset;    /* location to apply relocation to */
-	Elf64_Xword	r_info;      /* type+section for relocation */
-} Elf64_Rel;
-
-typedef struct {
-	Elf64_Addr	r_offset;    /* location to apply relocation to */
-	Elf64_Xword	r_info;      /* type+section for relocation */
-	Elf64_Sxword	r_addend;    /* constant addend */
-} Elf64_Rela;
-#endif
+// typedef Elf64_Syminfo GElf_Syminfo;
 
 typedef Elf64_Rela GElf_Rela;
 typedef Elf64_Rel GElf_Rel;
@@ -659,42 +620,6 @@ typedef Elf64_Rel GElf_Rel;
 /*
  * Symbol versioning structures.
  */
-
-/* 32-bit structures. */
-typedef struct
-{
-	Elf32_Word	vda_name;    /* Index to name. */
-	Elf32_Word	vda_next;    /* Offset to next entry. */
-} Elf32_Verdaux;
-
-typedef struct
-{
-	Elf32_Word	vna_hash;    /* Hash value of dependency name. */
-	Elf32_Half	vna_flags;   /* Flags. */
-	Elf32_Half	vna_other;   /* Unused. */
-	Elf32_Word	vna_name;    /* Offset to dependency name. */
-	Elf32_Word	vna_next;    /* Offset to next vernaux entry. */
-} Elf32_Vernaux;
-
-typedef struct
-{
-	Elf32_Half	vd_version;  /* Version information. */
-	Elf32_Half	vd_flags;    /* Flags. */
-	Elf32_Half	vd_ndx;	     /* Index into the versym section. */
-	Elf32_Half	vd_cnt;	     /* Number of aux entries. */
-	Elf32_Word	vd_hash;     /* Hash value of name. */
-	Elf32_Word	vd_aux;	     /* Offset to aux entries. */
-	Elf32_Word	vd_next;     /* Offset to next version definition. */
-} Elf32_Verdef;
-
-typedef struct
-{
-	Elf32_Half	vn_version;  /* Version number. */
-	Elf32_Half	vn_cnt;	     /* Number of aux entries. */
-	Elf32_Word	vn_file;     /* Offset of associated file name. */
-	Elf32_Word	vn_aux;	     /* Offset of vernaux array. */
-	Elf32_Word	vn_next;     /* Offset of next verneed entry. */
-} Elf32_Verneed;
 
 typedef Elf32_Half	Elf32_Versym;
 

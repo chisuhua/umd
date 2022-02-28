@@ -10,7 +10,7 @@ status_t CodeObjectReader::LoadExecutable(
             return ERROR_INVALID_EXECUTABLE;
         }
 
-        hsa_code_object_t code_object = { reinterpret_cast<uint64_t>(code_object_memory) };
+        hsa_code_object_t code_object = { reinterpret_cast<uint64_t>(code_object_memory), code_object_size };
         return exec->LoadCodeObject(
             agent, code_object, options, loaded_code_object);
     }

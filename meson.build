@@ -43,7 +43,7 @@ extra_c_args = extra_cpp_args
 #  extra_cpp_args += []
 #endif
 
-link_args = ['-ldl', '-lpthread', '-L' + meson.current_build_dir(), '-lstdc++', '-lelf' ]
+link_args = ['-ldl', '-lpthread', '-L' + meson.current_build_dir(), '-lstdc++', '-lrt' ]
 
 model_symbol_list = meson.current_source_dir() + '/symbol_export.def'
 
@@ -86,7 +86,13 @@ umd_src = [
   'program/file_util.cpp',
   'Umd.cc',
   'utils/debug.cpp',
-  'utils/flags.cpp'
+  'utils/flags.cpp',
+  'utils/os/os_posix.cpp',
+  'utils/os/os.cpp',
+  'utils/os/alloc.cpp',
+  'utils/thread/thread.cpp',
+  'utils/thread/semaphore.cpp',
+  'utils/thread/monitor.cpp'
   ]
 
 umd = shared_library(

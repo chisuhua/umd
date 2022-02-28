@@ -3,11 +3,12 @@
 #include "loader/Loader.h"
 #include "elfio/elfio.hpp"
 #include "Program.h"
+#include "utils/debug.hpp"
 
 using namespace ELFIO;
 
 void load_code_object_and_freeze_executable(
-    const std::string& file, IAgent* agent, loader::Executable* executable) {
+    std::ifstream& istream, IAgent* agent, loader::Executable* executable) {
     // TODO: the following sequence is inefficient, should be refactored
     //       into a single load of the file and subsequent ELFIO
     //       processing.
@@ -20,9 +21,13 @@ void load_code_object_and_freeze_executable(
 
     using RAII_code_reader = std::unique_ptr<CodeObjectReader, decltype(cor_deleter)>;
 
-    if (file.empty()) return;
+    istream.seekg(0, std::ios::end);
+    size_t file_size = istream.tellg();
+    char *file_data = new char[file_size];
+    istream.seekg(0, std::ios::beg);
+    istream.read(file_data, file_size);
 
-    RAII_code_reader tmp{CodeObjectReader::CreateFromMemory(file.data(), file.size()),
+    RAII_code_reader tmp{CodeObjectReader::CreateFromMemory(file_data, file_size),
         cor_deleter};
 
 
@@ -44,11 +49,17 @@ inline
 loader::Executable* load_executable(const std::string& file,
                                  loader::Executable* executable,
                                  IAgent* agent) {
-    ELFIO::elfio reader;
-    std::stringstream tmp{file};
+    std::ifstream stream;
+    stream.open(file.c_str(), std::ios::in | std::ios::binary);
+    if (!stream) {
+        fatal("can't open elf file");
+    }
 
-    if (!reader.load(tmp)) {
-        assert("Fail on elf read");
+    ELFIO::elfio reader;
+    // std::stringstream tmp{file};
+
+    if (!reader.load(stream)) {
+        fatal("Fail on elf read");
     }
 
     const auto code_object_dynsym = impl::find_section_if(
@@ -60,7 +71,7 @@ loader::Executable* load_executable(const std::string& file,
                                                        code_object_dynsym,
                                                        agent, executable);
 
-    load_code_object_and_freeze_executable(file, agent, executable);
+    load_code_object_and_freeze_executable(stream, agent, executable);
 
     return executable;
 }
