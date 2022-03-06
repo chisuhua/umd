@@ -29,7 +29,7 @@
 #include <time.h>
 #endif  // !_WIN32
 
-namespace amd {
+namespace utils {
 
 Semaphore::Semaphore() : state_(0) {
 #ifdef _WIN32
@@ -137,4 +137,4 @@ void Semaphore::timedWait(int millis) {
 #endif  // !_WIN32
 }
 
-}  // namespace amd
+}  // namespace utils

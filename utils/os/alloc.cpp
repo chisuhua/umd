@@ -24,7 +24,7 @@
 
 #include <cstdlib>
 
-namespace amd {
+namespace utils {
 
 void* AlignedMemory::allocate(size_t size, size_t alignment) {
   return Os::alignedMalloc(size, alignment);
@@ -34,7 +34,7 @@ void* GuardedMemory::allocate(size_t size, size_t alignment, size_t guardSize) {
   size_t sizeToAllocate = guardSize + alignment;
   sizeToAllocate += size + guardSize + Os::pageSize();
 
-  sizeToAllocate = amd::alignUp(sizeToAllocate, Os::pageSize());
+  sizeToAllocate = utils::alignUp(sizeToAllocate, Os::pageSize());
   address userHostMemGuarded = Os::reserveMemory(NULL, sizeToAllocate);
   if (!userHostMemGuarded ||
       !Os::commitMemory(userHostMemGuarded, sizeToAllocate, Os::MEM_PROT_RW)) {
@@ -42,7 +42,7 @@ void* GuardedMemory::allocate(size_t size, size_t alignment, size_t guardSize) {
   }
 
   address userHostMem = userHostMemGuarded + sizeToAllocate;
-  userHostMem = amd::alignDown(userHostMem - guardSize, Os::pageSize());
+  userHostMem = utils::alignDown(userHostMem - guardSize, Os::pageSize());
 
   // Protect the guard pages after the end of the users's buffer.
   if (!Os::protectMemory(userHostMem, guardSize, Os::MEM_PROT_NONE)) {
@@ -50,7 +50,7 @@ void* GuardedMemory::allocate(size_t size, size_t alignment, size_t guardSize) {
   }
 
   userHostMem = userHostMem - size;
-  userHostMem = amd::alignDown(userHostMem, alignment);
+  userHostMem = utils::alignDown(userHostMem, alignment);
   // Write the actual size allocated including all the guard pages,
   // alignment, page file size... as well as the size of guarded byte
   // count before the beginning of the user's buffer.
@@ -82,4 +82,4 @@ void* HeapObject::operator new(size_t size) { return malloc(size); }
 void HeapObject::operator delete(void* obj) { free(obj); }
 
 
-}  // namespace amd
+}  // namespace utils

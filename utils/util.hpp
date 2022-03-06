@@ -30,7 +30,7 @@
 #include <intrin.h>
 #endif
 
-namespace amd {
+namespace utils {
 
 /*! \addtogroup Utils Utilities
  *  @{
@@ -234,10 +234,10 @@ template <typename lambda> class ScopeGuard {
 
 #define MAKE_SCOPE_GUARD_HELPER(lname, sname, ...)                                                 \
   auto lname = __VA_ARGS__;                                                                        \
-  amd::ScopeGuard<decltype(lname)> sname(lname);
+  utils::ScopeGuard<decltype(lname)> sname(lname);
 #define MAKE_SCOPE_GUARD(name, ...)                                                                \
   MAKE_SCOPE_GUARD_HELPER(XCONCAT(scopeGuardLambda, __COUNTER__), name, __VA_ARGS__)
 
-/*@}*/} // namespace amd
+/*@}*/} // namespace utils
 
 #endif /*UTIL_HPP_*/

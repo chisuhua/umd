@@ -265,7 +265,7 @@ release(bool, AMD_CPU_AFFINITY, false,                                        \
 release(bool, ROC_USE_FGS_KERNARG, true,                                      \
         "Use fine grain kernel args segment for supported asics")
 
-namespace amd {
+namespace utils {
 
 extern bool IS_HIP;
 extern std::atomic_bool IS_PROFILER_ON;
@@ -325,7 +325,7 @@ struct Flag {
 };
 
 #define flagIsDefault(name) \
-  (amd::Flag::cannotSet##name || amd::Flag::isDefault(amd::Flag::k##name))
+  (utils::Flag::cannotSet##name || utils::Flag::isDefault(utils::Flag::k##name))
 
 #define setIfNotDefault(var, opt, other) \
   if (!flagIsDefault(opt)) \
@@ -335,7 +335,7 @@ struct Flag {
 
 //  @}
 
-} // namespace amd
+} // namespace utils
 
 #ifdef _WIN32
 # define EXPORT_FLAG extern "C" __declspec(dllexport)

@@ -34,7 +34,7 @@
 #endif /*!USE_DECLSPEC_THREAD*/
 #endif /*_WIN32*/
 
-namespace amd {
+namespace utils {
 
 /*! \addtogroup Threads Threading package
  *  @{
@@ -212,6 +212,6 @@ static inline Thread* currentThread() {
 
 inline Thread* Thread::current() { return details::currentThread(); }
 
-}  // namespace amd
+}  // namespace utils
 
 #endif /*THREAD_HPP_*/

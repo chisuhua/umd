@@ -43,7 +43,7 @@
 
 BOOL(WINAPI* pfnGetNumaNodeProcessorMaskEx)(USHORT, PGROUP_AFFINITY) = NULL;
 
-namespace amd {
+namespace utils {
 
 static size_t allocationGranularity_;
 
@@ -918,6 +918,6 @@ bool Os::MemoryMapFileTruncated(const char* fname, const void** mmap_ptr, size_t
   //TODO: fix with proper implementation
   return false;
 }
-}  // namespace amd
+}  // namespace utils
 
 #endif  // _WIN32 || __CYGWIN__

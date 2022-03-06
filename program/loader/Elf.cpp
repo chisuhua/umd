@@ -40,27 +40,27 @@
 
 //#ifdef DEBUG_DETAIL
 //
-//#define ElfTrace(level) ClPrint(level, amd::LOG_CODE, "%-5d: [%zx] %p %s: ", \
+//#define ElfTrace(level) ClPrint(level, utils::LOG_CODE, "%-5d: [%zx] %p %s: ", \
 //                                getpid(), std::this_thread::get_id(), this, __func__)
 //
 //#define logElfInfo(msg) \
-//  ClPrint(amd::LOG_INFO, amd::LOG_CODE, "%-5d: [%zx] %p %s: " msg, \
+//  ClPrint(utils::LOG_INFO, utils::LOG_CODE, "%-5d: [%zx] %p %s: " msg, \
 //          getpid(), std::this_thread::get_id(), this, __func__)
 //
 //#define logElfWarning(msg) \
-//  ClPrint(amd::LOG_WARNING, amd::LOG_CODE, "%-5d: [%zx] %p %s: " msg, \
+//  ClPrint(utils::LOG_WARNING, utils::LOG_CODE, "%-5d: [%zx] %p %s: " msg, \
 //          getpid(), std::this_thread::get_id(), this, __func__)
 //
 //#define LogElfDebug(format, ...) \
-//  ClPrint(amd::LOG_DEBUG, amd::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
+//  ClPrint(utils::LOG_DEBUG, utils::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
 //          getpid(), std::this_thread::get_id(), this, __func__, __VA_ARGS__)
 //
 //#define LogElfWarning(format, ...) \
-//  ClPrint(amd::LOG_WARNING, amd::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
+//  ClPrint(utils::LOG_WARNING, utils::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
 //          getpid(), std::this_thread::get_id(), this, __func__, __VA_ARGS__)
 //
 //#define LogElfInfo(format, ...) \
-//  ClPrint(amd::LOG_INFO, amd::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
+//  ClPrint(utils::LOG_INFO, utils::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
 //          getpid(), std::this_thread::get_id(), this, __func__, __VA_ARGS__)
 //#else
 #define ElfTrace(level)
@@ -72,11 +72,11 @@
 //#endif
 
 #define logElfError(msg) \
-  ClPrint(amd::LOG_ERROR, amd::LOG_CODE, "%-5d: [%zx] %p %s: " msg, \
+  ClPrint(utils::LOG_ERROR, utils::LOG_CODE, "%-5d: [%zx] %p %s: " msg, \
           getpid(), std::this_thread::get_id(), this, __func__)
 
 #define LogElfError(format, ...) \
-  ClPrint(amd::LOG_ERROR, amd::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
+  ClPrint(utils::LOG_ERROR, utils::LOG_CODE, "%-5d: [%zx] %p %s: " format, \
           getpid(), std::this_thread::get_id(), this, __func__, __VA_ARGS__)
 
 namespace co {
@@ -212,7 +212,7 @@ Elf::~Elf()
 
 bool Elf::Clear()
 {
-  ElfTrace(amd::LOG_INFO);
+  ElfTrace(utils::LOG_INFO);
 
   _elfio.clean();
   elfMemoryRelease();

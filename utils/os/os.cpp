@@ -35,7 +35,7 @@
 #include <xmmintrin.h>  // for _mm_pause
 #endif                  // ATI_ARCH_X86
 
-namespace amd {
+namespace utils {
 
 void* Os::loadLibrary(const char* libraryname) {
   void* handle;
@@ -172,4 +172,4 @@ void Os::setThreadAffinity(const void* handle, unsigned int cpu) {
   setThreadAffinity(handle, mask);
 }
 
-}  // namespace amd
+}  // namespace utils

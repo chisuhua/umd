@@ -33,7 +33,7 @@
 #include <unistd.h>
 #endif
 
-namespace amd { /*@{*/
+namespace utils { /*@{*/
 
 enum LogLevel { LOG_NONE = 0, LOG_ERROR = 1, LOG_WARNING = 2, LOG_INFO = 3, LOG_DEBUG = 4 };
 
@@ -82,7 +82,7 @@ extern void log_timestamped(LogLevel level, const char* file, int line, const ch
 extern void log_printf(LogLevel level, const char* file, int line, const char* format, ...);
 extern void log_printf(LogLevel level, const char* file, int line, uint64_t *start, const char* format, ...);
 
-/*@}*/} // namespace amd
+/*@}*/} // namespace utils
 
 #if __INTEL_COMPILER
 
@@ -97,10 +97,10 @@ extern void log_printf(LogLevel level, const char* file, int line, uint64_t *sta
 #define guarantee(cond, ...)                                                                       \
   if (!(cond)) {                                                                                   \
     if(strlen(#__VA_ARGS__) == 0)                                                                  \
-      amd::report_fatal(__FILE__, __LINE__,  XSTR(cond) );                                         \
+      utils::report_fatal(__FILE__, __LINE__,  XSTR(cond) );                                         \
     else                                                                                           \
-      amd::report_fatal(__FILE__, __LINE__,  XSTR(__VA_ARGS__) );                                  \
-    amd::breakpoint();                                                                             \
+      utils::report_fatal(__FILE__, __LINE__,  XSTR(__VA_ARGS__) );                                  \
+    utils::breakpoint();                                                                             \
   }
 
 #define fixme_guarantee(cond, ...) guarantee(cond, __VA_ARGS__)
@@ -113,7 +113,7 @@ extern void log_printf(LogLevel level, const char* file, int line, uint64_t *sta
 
 
 //! \brief Display a warning message.
-inline void warning(const char* msg) { amd::report_warning(msg); }
+inline void warning(const char* msg) { utils::report_warning(msg); }
 
 /*! \brief Abort the program with a "ShouldNotReachHere" message.
  *  \hideinitializer
@@ -144,28 +144,28 @@ inline void warning(const char* msg) { amd::report_warning(msg); }
 #define Log(level, msg)                                                                            \
   do {                                                                                             \
     if (AMD_LOG_LEVEL >= level) {                                                                  \
-      amd::log_entry(level, __FILE__, __LINE__, msg);                                              \
+      utils::log_entry(level, __FILE__, __LINE__, msg);                                              \
     }                                                                                              \
   } while (false)
 
 #define LogTS(level, msg)                                                                          \
   do {                                                                                             \
     if (AMD_LOG_LEVEL >= level) {                                                                  \
-      amd::log_timestamped(level, __FILE__, __LINE__, msg);                                        \
+      utils::log_timestamped(level, __FILE__, __LINE__, msg);                                        \
     }                                                                                              \
   } while (false)
 
 #define Logf(level, format, ...)                                                                   \
   do {                                                                                             \
     if (AMD_LOG_LEVEL >= level) {                                                                  \
-      amd::log_printf(level, __FILE__, __LINE__, format, __VA_ARGS__);                             \
+      utils::log_printf(level, __FILE__, __LINE__, format, __VA_ARGS__);                             \
     }                                                                                              \
   } while (false)
 
 #define CondLog(cond, msg)                                                                         \
   do {                                                                                             \
     if (false DEBUG_ONLY(|| (cond))) {                                                             \
-      Log(amd::LOG_INFO, msg);                                                                     \
+      Log(utils::LOG_INFO, msg);                                                                     \
     }                                                                                              \
   } while (false)
 
@@ -177,11 +177,11 @@ inline void warning(const char* msg) { amd::report_warning(msg); }
   } while (false)
 
 
-#define LogTSInfo(msg) LogTS(amd::LOG_INFO, msg)
-#define LogTSError(msg) LogTS(amd::LOG_ERROR, msg)
-#define LogTSWarning(msg) LogTS(amd::LOG_WARNING, msg)
+#define LogTSInfo(msg) LogTS(utils::LOG_INFO, msg)
+#define LogTSError(msg) LogTS(utils::LOG_ERROR, msg)
+#define LogTSWarning(msg) LogTS(utils::LOG_WARNING, msg)
 
-#define DebugInfoGuarantee(cond) LogGuarantee(cond, amd::LOG_INFO, "Warning")
+#define DebugInfoGuarantee(cond) LogGuarantee(cond, utils::LOG_INFO, "Warning")
 
 /* backend and compiler use AMD_LOG_LEVEL macro from makefile. Define AMD_LOG_MASK for them. */
 #if defined(AMD_LOG_LEVEL)
@@ -195,11 +195,11 @@ inline void warning(const char* msg) { amd::report_warning(msg); }
 #define ClPrint(level, mask, format, ...)                                                          \
   do {                                                                                             \
     if (AMD_LOG_LEVEL >= level) {                                                                  \
-      if (AMD_LOG_MASK & mask || mask == amd::LOG_ALWAYS) {                                        \
-        if (AMD_LOG_MASK & amd::LOG_LOCATION) {                                                    \
-          amd::log_printf(level, __FILENAME__, __LINE__, format, ##__VA_ARGS__);                   \
+      if (AMD_LOG_MASK & mask || mask == utils::LOG_ALWAYS) {                                        \
+        if (AMD_LOG_MASK & utils::LOG_LOCATION) {                                                    \
+          utils::log_printf(level, __FILENAME__, __LINE__, format, ##__VA_ARGS__);                   \
         } else {                                                                                   \
-          amd::log_printf(level, "", 0, format, ##__VA_ARGS__);                                    \
+          utils::log_printf(level, "", 0, format, ##__VA_ARGS__);                                    \
         }                                                                                          \
       }                                                                                            \
     }                                                                                              \
@@ -209,11 +209,11 @@ inline void warning(const char* msg) { amd::report_warning(msg); }
 #define HIPPrintDuration(level, mask, startTimeUs, format, ...)                                    \
   do {                                                                                             \
     if (AMD_LOG_LEVEL >= level) {                                                                  \
-      if (AMD_LOG_MASK & mask || mask == amd::LOG_ALWAYS) {                                        \
-        if (AMD_LOG_MASK & amd::LOG_LOCATION) {                                                    \
-          amd::log_printf(level, __FILENAME__, __LINE__, startTimeUs,format, ##__VA_ARGS__);       \
+      if (AMD_LOG_MASK & mask || mask == utils::LOG_ALWAYS) {                                        \
+        if (AMD_LOG_MASK & utils::LOG_LOCATION) {                                                    \
+          utils::log_printf(level, __FILENAME__, __LINE__, startTimeUs,format, ##__VA_ARGS__);       \
         } else {                                                                                   \
-           amd::log_printf(level, "", 0, startTimeUs, format, ##__VA_ARGS__);                      \
+           utils::log_printf(level, "", 0, startTimeUs, format, ##__VA_ARGS__);                      \
         }                                                                                          \
       }                                                                                            \
     }                                                                                              \
@@ -222,8 +222,8 @@ inline void warning(const char* msg) { amd::report_warning(msg); }
 #define ClCondPrint(level, mask, condition, format, ...)                                           \
   do {                                                                                             \
     if (AMD_LOG_LEVEL >= level && (condition)) {                                                   \
-      if (AMD_LOG_MASK & mask || mask == amd::LOG_ALWAYS) {                                        \
-        amd::log_printf(level, __FILE__, __LINE__, format, ##__VA_ARGS__);                         \
+      if (AMD_LOG_MASK & mask || mask == utils::LOG_ALWAYS) {                                        \
+        utils::log_printf(level, __FILE__, __LINE__, format, ##__VA_ARGS__);                         \
       }                                                                                            \
     }                                                                                              \
   } while (false)
@@ -235,14 +235,14 @@ inline void warning(const char* msg) { amd::report_warning(msg); }
 
 #define ClTrace(level, mask) ClPrint(level, mask, "%s", __func__)
 
-#define LogInfo(msg) ClPrint(amd::LOG_INFO, amd::LOG_ALWAYS, msg)
-#define LogError(msg) ClPrint(amd::LOG_ERROR, amd::LOG_ALWAYS, msg)
-#define LogWarning(msg) ClPrint(amd::LOG_WARNING, amd::LOG_ALWAYS, msg)
+#define LogInfo(msg) ClPrint(utils::LOG_INFO, utils::LOG_ALWAYS, msg)
+#define LogError(msg) ClPrint(utils::LOG_ERROR, utils::LOG_ALWAYS, msg)
+#define LogWarning(msg) ClPrint(utils::LOG_WARNING, utils::LOG_ALWAYS, msg)
 
-#define LogPrintfDebug(format, ...) ClPrint(amd::LOG_DEBUG, amd::LOG_ALWAYS, format, __VA_ARGS__)
-#define LogPrintfError(format, ...) ClPrint(amd::LOG_ERROR, amd::LOG_ALWAYS, format, __VA_ARGS__)
-#define LogPrintfWarning(format, ...) ClPrint(amd::LOG_WARNING, amd::LOG_ALWAYS, format, __VA_ARGS__)
-#define LogPrintfInfo(format, ...) ClPrint(amd::LOG_INFO, amd::LOG_ALWAYS, format, __VA_ARGS__)
+#define LogPrintfDebug(format, ...) ClPrint(utils::LOG_DEBUG, utils::LOG_ALWAYS, format, __VA_ARGS__)
+#define LogPrintfError(format, ...) ClPrint(utils::LOG_ERROR, utils::LOG_ALWAYS, format, __VA_ARGS__)
+#define LogPrintfWarning(format, ...) ClPrint(utils::LOG_WARNING, utils::LOG_ALWAYS, format, __VA_ARGS__)
+#define LogPrintfInfo(format, ...) ClPrint(utils::LOG_INFO, utils::LOG_ALWAYS, format, __VA_ARGS__)
 
 #if (defined(DEBUG) || defined(DEV_LOG_ENABLE))
   #define DevLogPrintfError(format, ...) LogPrintfError(format, __VA_ARGS__)

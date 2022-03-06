@@ -23,7 +23,7 @@
 
 #include "top.hpp"
 
-namespace amd {
+namespace utils {
 
 class AlignedMemory : public AllStatic {
  public:
@@ -39,6 +39,6 @@ class GuardedMemory : public AllStatic {
   static void deallocate(void* ptr);
 };
 
-}  // namespace amd
+}  // namespace utils
 
 #endif /*ALLOC_HPP_*/

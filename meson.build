@@ -113,7 +113,7 @@ umdcuda_inc = [
   ]
 
 umdcuda_src = [
-	'libcuda/UmdCuda.cc',
+	'platform/libcuda/UmdCuda.cc',
   ]
 
 umdcuda = shared_library(
@@ -138,5 +138,35 @@ umdcuda = shared_library(
 #  cpp_args : extra_cpp_args,
 #  link_args : module_link_args,
 #  #dependencies: declare_dependency(link_with : )
+#  )
+utils_src = [
+  'utils/lnx/os_linux.cpp']
+
+dev_link_args = link_args + ['-lpthread']
+
+dev_inc = ['.', 'include', 'dev']
+
+dev_src = [
+  'device/Device.cpp',
+  'device/DeviceInfo.cpp',
+  'device/GpuMemory.cpp',
+  'device/MemMgr.cpp',
+  'device/Vma.cpp',
+  'device/Debug.cpp',
+  'device/Doorbells.cpp',
+  'device/QueueMgr.cpp',
+  'device/EventMgr.cpp',
+  'device/MemObj.cpp',
+  'device/Topology.cpp',
+  'device/cmdio/cmdio_api.cpp'
+]
+
+#hal = shared_library(
+#  'hal',
+#  hal_src,
+#  include_directories : include_directories(hal_inc),
+#  install : false,
+#  cpp_args : extra_cpp_args,
+#  link_args : hal_link_args,
 #  )
 

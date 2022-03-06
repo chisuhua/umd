@@ -30,7 +30,7 @@
 #endif /*linux*/
 
 
-namespace amd {
+namespace utils {
 
 /*! \addtogroup Threads
  *  @{
@@ -74,6 +74,6 @@ static_assert(sizeof(Semaphore) == 64 ,
  *  @}
  */
 
-}  // namespace amd
+}  // namespace utils
 
 #endif /*SEMAPHORE_HPP_*/

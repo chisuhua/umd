@@ -304,7 +304,7 @@ void RegionMemory::Free()
 bool RegionMemory::Freeze()
 {
     assert(this->Allocated() && nullptr != host_ptr_);
-    Umd::get(m_ctx)->free_memregion(region_);
+    Umd::get(m_ctx)->memory_copy(ptr_, host_ptr_, size_, UmdMemcpyKind::HostToDevice);
 /*
     IAgent* agent = region_->owner();
     if (agent != NULL && agent->agent_type() == IAgent::kGpu) {

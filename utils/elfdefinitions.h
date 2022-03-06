@@ -623,6 +623,7 @@ typedef Elf64_Rel GElf_Rel;
 
 typedef Elf32_Half	Elf32_Versym;
 
+#if 0
 /* 64-bit structures. */
 
 typedef struct {
@@ -655,6 +656,7 @@ typedef struct {
 	Elf64_Word	vn_aux;	     /* Offset of vernaux array. */
 	Elf64_Word	vn_next;     /* Offset of next verneed entry. */
 } Elf64_Verneed;
+#endif
 
 typedef Elf64_Half	Elf64_Versym;
 

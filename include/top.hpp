@@ -103,7 +103,7 @@ constexpr size_t G = K * K * K;
 //! \addtogroup Utils
 
 //! Namespace for AMD's OpenCL platform
-namespace amd { /*@{*/
+namespace utils { /*@{*/
 
 //! \brief The default Null object type (!= void*);
 struct Null {};

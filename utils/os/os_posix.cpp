@@ -62,7 +62,7 @@
 #include <mutex>
 
 
-namespace amd {
+namespace utils {
 
 static struct sigaction oldSigAction;
 
@@ -336,7 +336,7 @@ void* guessTlsSizeThread(void* param) {
   currentFrame = reinterpret_cast<address>(&stackSize);
   tlsSize = stackBase - currentFrame;
   // align up to page boundary
-  tlsSize = alignUp(tlsSize, amd::Os::pageSize());
+  tlsSize = alignUp(tlsSize, utils::Os::pageSize());
   return NULL;
 }
 
@@ -355,7 +355,7 @@ static void guessTlsSize(void) {
   ::pthread_attr_destroy(&threadAttr);
 }
 
-const void* Os::createOsThread(amd::Thread* thread) {
+const void* Os::createOsThread(utils::Thread* thread) {
   pthread_attr_t threadAttr;
   ::pthread_attr_init(&threadAttr);
 
@@ -373,7 +373,7 @@ const void* Os::createOsThread(amd::Thread* thread) {
   // We never plan the use join, so free the resources now.
   ::pthread_attr_setdetachstate(&threadAttr, PTHREAD_CREATE_DETACHED);
   if (!AMD_CPU_AFFINITY) {
-    ClPrint(amd::LOG_INFO, amd::LOG_INIT, "Reseting CPU core affinities");
+    ClPrint(utils::LOG_INFO, utils::LOG_INIT, "Reseting CPU core affinities");
     cpu_set_t cpuset;
     if (processorCount_ > 0) {
       CPU_ZERO(&cpuset);
@@ -403,7 +403,7 @@ void Os::setThreadAffinity(const void* handle, const Os::ThreadAffinityMask& mas
 
 bool Os::setThreadAffinityToMainThread() {
   if (AMD_CPU_AFFINITY) {
-    ClPrint(amd::LOG_INFO, amd::LOG_INIT, "Setting Affinity to the main thread's affinity");
+    ClPrint(utils::LOG_INFO, utils::LOG_INIT, "Setting Affinity to the main thread's affinity");
     pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &nativeMask_);
   }
   return true;
@@ -610,9 +610,9 @@ std::string Os::getEnvironment(const std::string& name) {
 }
 
 std::string Os::getTempPath() {
-  std::string tempFolder = amd::Os::getEnvironment("TEMP");
+  std::string tempFolder = utils::Os::getEnvironment("TEMP");
   if (tempFolder.empty()) {
-    tempFolder = amd::Os::getEnvironment("TMP");
+    tempFolder = utils::Os::getEnvironment("TMP");
   }
 
   if (tempFolder.empty()) {
@@ -850,6 +850,6 @@ bool Os::MemoryMapFileTruncated(const char* fname, const void** mmap_ptr, size_t
   return true;
 }
 
-}  // namespace amd
+}  // namespace utils
 
 #endif  // !defined(_WIN32) && !defined(__CYGWIN__)

@@ -75,7 +75,7 @@ const char* removeQuotes(const char* Value) {
 }
 }
 
-namespace amd {
+namespace utils {
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -203,7 +203,7 @@ Flag Flag::flags_[] = {
 #undef DEFINE_DEBUG_FLAG_STRUCT
 #undef DEFINE_RELEASE_FLAG_STRUCT
 
-}  // namespace amd
+}  // namespace utils
 
 #define DEFINE_RELEASE_FLAG_VALUE(type, name, value, help) type name = value;
 #define DEFINE_DEBUG_FLAG_VALUE(type, name, value, help) DEBUG_ONLY(type name = value);

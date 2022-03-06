@@ -36,7 +36,7 @@
 #include <windows.h>
 #endif  // _WIN32
 
-namespace amd {
+namespace utils {
 
 FILE* outFile = stderr;
 
@@ -135,4 +135,4 @@ void log_printf(LogLevel level, const char* file, int line, uint64_t* start,
   }
 }
 
-}  // namespace amd
+}  // namespace utils

@@ -29,7 +29,7 @@
 #include <tuple>
 #include <utility>
 
-namespace amd {
+namespace utils {
 
 /*! \addtogroup Threads
  *  @{
@@ -260,6 +260,6 @@ inline void Monitor::unlock() {
   finishUnlock();
 }
 
-}  // namespace amd
+}  // namespace utils
 
 #endif /*MONITOR_HPP_*/

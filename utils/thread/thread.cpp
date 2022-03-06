@@ -27,7 +27,7 @@
 #include <windows.h>
 #endif  // _WIN32
 
-namespace amd {
+namespace utils {
 
 HostThread::HostThread() : Thread("HostThread", 0, false) {
   setCurrent();
@@ -178,4 +178,4 @@ void Thread::tearDown() {
 #endif  // _WIN32 && !USE_DECLSPEC_THREAD
 }
 
-}  // namespace amd
+}  // namespace utils

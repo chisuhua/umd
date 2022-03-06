@@ -39,7 +39,7 @@
 #define MIN_PAGE_SHIFT 12
 #define MIN_PAGE_SIZE (1UL << MIN_PAGE_SHIFT)
 
-namespace amd {
+namespace utils {
 
 /*! \addtogroup Os Operating System Abstraction
  *
@@ -497,6 +497,6 @@ inline uint Os::ThreadAffinityMask::getNextSet(uint cpu) const {
 
 #endif
 
-}  // namespace amd
+}  // namespace utils
 
 #endif /*OS_HPP_*/

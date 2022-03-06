@@ -1,3 +1,4 @@
+#pragma once
 #include "status.h"
 #include <cstddef>
 #include <string>
@@ -5,7 +6,7 @@
 #include <unordered_map>
 #include <dlfcn.h>
 #include <assert.h>
-#include "IPlatform.h"
+#include "platform/IPlatform.h"
 
 
 class Umd;
@@ -91,11 +92,12 @@ public:
     status_t memory_register(void* address, size_t size);
     status_t memory_deregister(void* address, size_t size);
     status_t memory_allocate(size_t size, void** ptr, IMemRegion *region = nullptr);
+    status_t memory_copy(void* dst, const void* src, size_t count, UmdMemcpyKind kind);
     status_t memory_free(void* ptr);
     IMemRegion* get_system_memregion();
     IMemRegion* get_device_memregion(IAgent* agent);
     status_t free_memregion(IMemRegion *region);
     loader::Executable* load_program(const std::string& file);
-    void set_kernel_disp(const std::string& kernel_name, loader::Executable* exec, DispatchInfo* disp_info, struct dim3 gridDim, struct dim3 blockDim, uint64_t param_addr);
+    void set_kernel_disp(const std::string& kernel_name, loader::Executable* exec, DispatchInfo** disp_info, struct dim3 gridDim, struct dim3 blockDim, uint64_t param_addr);
 };
 
