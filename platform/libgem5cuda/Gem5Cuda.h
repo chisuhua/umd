@@ -3,10 +3,10 @@
 #include "../IPlatform.h"
 
 
-class UmdCuda : public IPlatform {
+class Gem5Cuda : public IPlatform {
 public:
-    UmdCuda() { }
-    ~UmdCuda() = default;
+    Gem5Cuda() { }
+    ~Gem5Cuda() = default;
 
     status_t memory_register(void* address, size_t size);
     status_t memory_deregister(void* address, size_t size);
@@ -14,9 +14,9 @@ public:
     status_t memory_copy(void* dst, const void* src, size_t count, UmdMemcpyKind kind);
     status_t memory_free(void* ptr);
 
-    status_t getDeviceCount(int* count) {};
-    status_t getDeviceProperties(void* prop) {};
-    status_t getDevice(int* device) {};
+    status_t getDeviceCount(int* count);
+    status_t getDeviceProperties(void* prop, int id= 0);
+    status_t getDevice(int* device);
 
     IMemRegion* get_system_memregion();
     IMemRegion* get_device_memregion(IAgent* agent);

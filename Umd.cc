@@ -13,6 +13,37 @@ struct dim3
     unsigned int x, y, z;
 };
 
+Umd* Umd::get(CUctx* ctx) {
+        if (g_umd_instance.count(ctx) == 1) return g_umd_instance[ctx];
+        char *buff = getenv("UMD");
+        std::string ret = "umdcuda";
+        if (buff) {
+            ret = buff;
+        }
+        if (g_platform_instance.count(ret) == 0)  {
+            std::string umd_libname = "lib";
+            umd_libname += ret;
+            umd_libname += ".so";
+
+            pfn_create_platform create_platform = nullptr;
+            void* handle = dlopen(umd_libname.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+            if (handle == nullptr) {
+                printf("dlopen error - %s\n", dlerror());
+                assert(false);
+            }
+            create_platform = (pfn_create_platform)dlsym(handle, "create_platform");
+            if (create_platform == nullptr) {
+                printf("dlsym error - %s\n", dlerror());
+                assert(false);
+            }
+            g_platform_instance[ret] = (*create_platform)();
+        }
+        Umd* umd = new Umd(ctx, g_platform_instance[ret]);
+        g_platform_instance[ret]->setCtx(ctx);
+        g_umd_instance[ctx] = umd;
+        return umd;
+};
+
 loader::Executable* Umd::load_program(const std::string& file) {
     return LoadProgram(file, m_ctx, m_ctx->get_agent());
 };
@@ -52,6 +83,18 @@ status_t Umd::memory_copy(void* dst, const void* src, size_t count, UmdMemcpyKin
 status_t Umd::memory_free(void* ptr) {
     return m_platform->memory_free(ptr);
 }
+
+status_t Umd::getDeviceCount(int* count) {
+    return m_platform->getDeviceCount(count);
+};
+
+status_t Umd::getDeviceProperties(void* prop, int id) {
+    return m_platform->getDeviceProperties(prop, id);
+};
+
+status_t Umd::getDevice(int* device) {
+    return m_platform->getDevice(device);
+};
 
 /*
 status_t Umd::memory_copy(void* ptr) {

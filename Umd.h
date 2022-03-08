@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <dlfcn.h>
 #include <assert.h>
-#include "platform/IPlatform.h"
+#include "common.h"
 
 
 class Umd;
@@ -14,6 +14,7 @@ class IMemRegion;
 class IAgent;
 class CUctx;
 class DispatchInfo;
+class IPlatform;
 
 namespace loader {
     class Executable;
@@ -49,36 +50,7 @@ struct dim3
 
 class Umd {
 public:
-    static Umd* get(CUctx* ctx) {
-        if (g_umd_instance.count(ctx) == 1) return g_umd_instance[ctx];
-        char *buff = getenv("UMD");
-        std::string ret = "umdcuda";
-        if (buff) {
-            ret = buff;
-        }
-        if (g_platform_instance.count(ret) == 0)  {
-            std::string umd_libname = "lib";
-            umd_libname += ret;
-            umd_libname += ".so";
-
-            pfn_create_platform create_platform = nullptr;
-            void* handle = dlopen(umd_libname.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-            if (handle == nullptr) {
-                printf("dlopen error - %s\n", dlerror());
-                assert(false);
-            }
-            create_platform = (pfn_create_platform)dlsym(handle, "create_platform");
-            if (create_platform == nullptr) {
-                printf("dlsym error - %s\n", dlerror());
-                assert(false);
-            }
-            g_platform_instance[ret] = (*create_platform)();
-        }
-        Umd* umd = new Umd(ctx, g_platform_instance[ret]);
-        g_platform_instance[ret]->setCtx(ctx);
-        g_umd_instance[ctx] = umd;
-        return umd;
-    };
+    static Umd* get(CUctx* ctx);
 
     Umd(CUctx *ctx, IPlatform *platform) {
         m_ctx = ctx;
@@ -94,10 +66,15 @@ public:
     status_t memory_allocate(size_t size, void** ptr, IMemRegion *region = nullptr);
     status_t memory_copy(void* dst, const void* src, size_t count, UmdMemcpyKind kind);
     status_t memory_free(void* ptr);
+    status_t memory_set(void* ptr, int c, size_t count);
     IMemRegion* get_system_memregion();
     IMemRegion* get_device_memregion(IAgent* agent);
     status_t free_memregion(IMemRegion *region);
     loader::Executable* load_program(const std::string& file);
     void set_kernel_disp(const std::string& kernel_name, loader::Executable* exec, DispatchInfo** disp_info, struct dim3 gridDim, struct dim3 blockDim, uint64_t param_addr);
+
+    status_t getDeviceCount(int* count);
+    status_t getDeviceProperties(void* prop, int id = 0);
+    status_t getDevice(int* device);
 };
 
