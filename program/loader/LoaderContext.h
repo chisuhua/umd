@@ -2,11 +2,11 @@
 
 #include "Loader.h"
 
-class CUctx;
+class IContext;
 
 class LoaderContext final : public loader::Context {
 public:
-    LoaderContext(CUctx* ctx)
+    LoaderContext(IContext* ctx)
         : loader::Context()
         , m_ctx(ctx)
     {
@@ -31,7 +31,7 @@ public:
     bool SegmentFreeze(amdgpu_hsa_elf_segment_t segment, IAgent* agent, void* seg, size_t size) override;
 
     // bool ImageExtensionSupported() override;
-    CUctx* m_ctx;
+    IContext* m_ctx;
 
 private:
     LoaderContext(const LoaderContext&);

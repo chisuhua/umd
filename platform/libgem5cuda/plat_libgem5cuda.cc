@@ -1,0 +1,110 @@
+#include "../../libcuda/CUctx.h"
+#include "../../libcuda/abstract_hardware_model.h"
+#include "../../libcuda/gpu-sim.h"
+#include "../../libcuda/stream_manager.h"
+#include "../../libcuda/gpgpu_context.h"
+#include "driver/cuda/Context.h"
+#include "plat_libgem5cuda.h"
+#include "../../libcuda/gem5cuda/gem5cuda_runtime_api.h"
+#include <map>
+#include <typeinfo>
+
+using namespace libcuda;
+
+extern "C" IPlatform* create_platform(IContext* ctx) {
+    static std::unordered_map<std::string, IPlatform*> platform_instance;
+    if (platform_instance.count(typeid(*ctx).name()) == 0) {
+        platform_instance[typeid(*ctx).name()] = new plat_libgem5cuda(typeid(*ctx).name(), dynamic_cast<drv::CUctx*>(ctx));
+    }
+    return platform_instance[typeid(*ctx).name()];
+};
+
+
+status_t plat_libgem5cuda::memory_register(void* address, size_t size) {
+  if (size == 0 && address != NULL) {
+    return ERROR_INVALID_ARGUMENT;
+  }
+
+  return SUCCESS;
+}
+
+status_t plat_libgem5cuda::memory_deregister(void* address, size_t size) {
+  return SUCCESS;
+}
+
+IMemRegion* sys_memregion;
+status_t plat_libgem5cuda::memory_allocate(size_t size, void** ptr, IMemRegion *region) {
+  if (region != nullptr) {
+    *ptr = malloc(size);
+  } else {
+    gem5cudaMalloc(ptr, size);
+  }
+  return SUCCESS;
+}
+
+status_t plat_libgem5cuda::memory_copy(void* dst, const void* src, size_t count, UmdMemcpyKind kind) {
+    if (kind == UmdMemcpyKind::HostToDevice)
+      gem5cudaMemcpy(dst, src, count, cudaMemcpyHostToDevice);
+    else if (kind == UmdMemcpyKind::DeviceToHost)
+      gem5cudaMemcpy(dst, src, count, cudaMemcpyDeviceToHost);
+    else if (kind == UmdMemcpyKind::DeviceToDevice)
+      gem5cudaMemcpy(dst, src, count, cudaMemcpyDeviceToDevice);
+    else if (kind == UmdMemcpyKind::Default) {
+      if ((size_t)src >= GLOBAL_HEAP_START) {
+        if ((size_t)dst >= GLOBAL_HEAP_START)
+          gem5cudaMemcpy(dst, src, count, cudaMemcpyDeviceToDevice);
+        else
+          gem5cudaMemcpy(dst, src, count, cudaMemcpyDeviceToHost);
+      } else {
+        if ((size_t)dst >= GLOBAL_HEAP_START)
+          gem5cudaMemcpy(dst, src, count, cudaMemcpyHostToDevice);
+        else {
+          printf(
+              "GPGPU-Sim PTX: UmdMemcpyKind:: - ERROR : unsupported transfer: host to "
+              "host\n");
+          abort();
+        }
+      }
+    } else {
+      printf("GPGPU-Sim PTX: UmdMemcpyKind:: - ERROR : unsupported UmdMemcpyKind::Kind\n");
+      abort();
+    }
+
+};
+
+status_t plat_libgem5cuda::memory_free(void* ptr) {
+  gem5cudaFree(ptr);
+  return SUCCESS;
+}
+
+IMemRegion* plat_libgem5cuda::get_system_memregion() {
+  // FIXME fake
+  uint64_t *tmp = (uint64_t*)&sys_memregion;
+  *tmp = 1;
+  return sys_memregion;
+}
+
+IMemRegion* plat_libgem5cuda::get_device_memregion(IAgent* agent) {
+  return nullptr;
+}
+
+status_t plat_libgem5cuda::free_memregion(IMemRegion *region) {
+  return SUCCESS;
+}
+
+status_t plat_libgem5cuda::getDeviceCount(int* count) {
+  gem5cudaGetDeviceCount(count);
+  return SUCCESS;
+};
+
+status_t plat_libgem5cuda::getDeviceProperties(void* prop, int id) {
+  gem5cudaGetDeviceProperties((cudaDeviceProp*)prop, id);
+  return SUCCESS;
+};
+
+status_t plat_libgem5cuda::getDevice(int* device) {
+  gem5cudaGetDevice(device);
+  return SUCCESS;
+};
+
+

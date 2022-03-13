@@ -1,6 +1,7 @@
 // we expect block block level in compute unit
 // for grid level, it have gridStartX/Y/Z is used by CP
 #define SHADER_ABI_USER_DATA_REGISTER_NUM_MAX 32
+#include <stdint.h>
 
 
 union SHADER_ABI_KERNEL_CONTROL {

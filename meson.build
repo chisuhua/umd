@@ -84,7 +84,8 @@ umd_src = [
   'program/Program.cpp',
   'program/ProgramState.cpp',
   'program/file_util.cpp',
-  'Umd.cc',
+  'platform/IPlatform.cpp',
+  'driver/cuda/api/Module.cpp',
   'utils/debug.cpp',
   'utils/flags.cpp',
   'utils/os/os_posix.cpp',
@@ -104,25 +105,46 @@ umd = shared_library(
   link_args : umd_link_args,
   )
 
-umdcuda_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
-umdcuda_inc = [
+platlibcuda_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
+platlibcuda_inc = [
   '../3rdparty/msgpack-c/include',
   DESIGN_ROOT + '/opu/coasm',
   DESIGN_ROOT + '/libcuda',
   CUDA_INSTALL_PATH + '/include'
   ]
 
-umdcuda_src = [
-	'platform/libcuda/UmdCuda.cc',
+platlibcuda_src = [
+	'platform/libcuda/plat_libcuda.cc',
   ]
 
-umdcuda = shared_library(
-  'umdcuda',
-  umdcuda_src,
-  include_directories : include_directories(umdcuda_inc),
+platlibcuda = shared_library(
+  'platlibcuda',
+  platlibcuda_src,
+  include_directories : include_directories(platlibcuda_inc),
   install : false,
   cpp_args : extra_cpp_args,
-  link_args : umdcuda_link_args,
+  link_args : platlibcuda_link_args,
+  )
+
+platlibgem5cuda_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
+platlibgem5cuda_inc = [
+  '../3rdparty/msgpack-c/include',
+  DESIGN_ROOT + '/opu/coasm',
+  DESIGN_ROOT + '/libcuda',
+  CUDA_INSTALL_PATH + '/include'
+  ]
+
+platlibgem5cuda_src = [
+	'platform/libgem5cuda/plat_libgem5cuda.cc',
+  ]
+
+platlibgem5cuda = shared_library(
+  'platlibgem5cuda',
+  platlibgem5cuda_src,
+  include_directories : include_directories(platlibgem5cuda_inc),
+  install : false,
+  cpp_args : extra_cpp_args,
+  link_args : platlibgem5cuda_link_args,
   )
 
 #test_simple_src = [

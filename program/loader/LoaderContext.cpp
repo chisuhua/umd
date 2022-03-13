@@ -1,5 +1,5 @@
 #include "LoaderContext.h"
-#include "Umd.h"
+#include "platform/IPlatform.h"
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -28,8 +28,8 @@ public:
     virtual bool Freeze() = 0;
 
 protected:
-    SegmentMemory(CUctx* ctx) : m_ctx(ctx) { }
-    CUctx* m_ctx;
+    SegmentMemory(IContext* ctx) : m_ctx(ctx) { }
+    IContext* m_ctx;
 
 private:
     SegmentMemory(const SegmentMemory&);
@@ -38,7 +38,7 @@ private:
 
 class MallocedMemory final : public SegmentMemory {
 public:
-    MallocedMemory(CUctx* ctx)
+    MallocedMemory(IContext* ctx)
         : SegmentMemory(ctx)
         , ptr_(nullptr)
         , size_(0)
@@ -82,7 +82,7 @@ bool MallocedMemory::Allocate(size_t size, size_t align, bool zero)
     if (nullptr == ptr_) {
         return false;
     }
-    if (SUCCESS != Umd::get(m_ctx)->memory_register(ptr_, size)) {
+    if (SUCCESS != IPlatform::getInstance(m_ctx)->memory_register(ptr_, size)) {
         _aligned_free(ptr_);
         ptr_ = nullptr;
         return false;
@@ -106,7 +106,7 @@ bool MallocedMemory::Copy(size_t offset, const void* src, size_t size)
 void MallocedMemory::Free()
 {
     assert(this->Allocated());
-    Umd::get(m_ctx)->memory_deregister(ptr_, size_);
+    IPlatform::getInstance(m_ctx)->memory_deregister(ptr_, size_);
     _aligned_free(ptr_);
     ptr_ = nullptr;
     size_ = 0;
@@ -120,7 +120,7 @@ bool MallocedMemory::Freeze()
 
 class MappedMemory final : public SegmentMemory {
 public:
-    MappedMemory(CUctx* ctx)
+    MappedMemory(IContext* ctx)
         : SegmentMemory(ctx)
         , ptr_(nullptr)
         , size_(0)
@@ -169,7 +169,7 @@ bool MappedMemory::Allocate(size_t size, size_t align, bool zero)
         return false;
     }
     assert(0 == ((uintptr_t)ptr_) % align);
-    if (SUCCESS != Umd::get(m_ctx)->memory_register(ptr_, size)) {
+    if (SUCCESS != IPlatform::getInstance(m_ctx)->memory_register(ptr_, size)) {
 #if defined(_WIN32) || defined(_WIN64)
         VirtualFree(ptr_, size, MEM_DECOMMIT);
         VirtualFree(ptr_, 0, MEM_RELEASE);
@@ -198,7 +198,7 @@ bool MappedMemory::Copy(size_t offset, const void* src, size_t size)
 void MappedMemory::Free()
 {
     assert(this->Allocated());
-    Umd::get(m_ctx)->memory_deregister(ptr_, size_);
+    IPlatform::getInstance(m_ctx)->memory_deregister(ptr_, size_);
 #if defined(_WIN32) || defined(_WIN64)
     VirtualFree(ptr_, size_, MEM_DECOMMIT);
     VirtualFree(ptr_, 0, MEM_RELEASE);
@@ -217,7 +217,7 @@ bool MappedMemory::Freeze()
 
 class RegionMemory final : public SegmentMemory {
 public:
-    RegionMemory(IMemRegion* region, CUctx *ctx)
+    RegionMemory(IMemRegion* region, IContext *ctx)
         : SegmentMemory(ctx)
         , region_(region)
         , ptr_(nullptr)
@@ -262,13 +262,13 @@ bool RegionMemory::Allocate(size_t size, size_t align, bool zero)
     assert(!this->Allocated());
     assert(0 < size);
     assert(0 < align && 0 == (align & (align - 1)));
-    if (SUCCESS != Umd::get(m_ctx)->memory_allocate(size, &ptr_, region_)) {
+    if (SUCCESS != IPlatform::getInstance(m_ctx)->memory_allocate(size, &ptr_, region_)) {
         ptr_ = nullptr;
         return false;
     }
     assert(0 == ((uintptr_t)ptr_) % align);
-    if (SUCCESS != Umd::get(m_ctx)->memory_allocate(size, &host_ptr_, Umd::get(m_ctx)->get_system_memregion())) {
-        Umd::get(m_ctx)->memory_free(ptr_);
+    if (SUCCESS != IPlatform::getInstance(m_ctx)->memory_allocate(size, &host_ptr_, IPlatform::getInstance(m_ctx)->get_system_memregion())) {
+        IPlatform::getInstance(m_ctx)->memory_free(ptr_);
         ptr_ = nullptr;
         host_ptr_ = nullptr;
         return false;
@@ -292,9 +292,9 @@ bool RegionMemory::Copy(size_t offset, const void* src, size_t size)
 void RegionMemory::Free()
 {
     assert(this->Allocated());
-    Umd::get(m_ctx)->memory_free(ptr_);
+    IPlatform::getInstance(m_ctx)->memory_free(ptr_);
     if (nullptr != host_ptr_) {
-        Umd::get(m_ctx)->memory_free(host_ptr_);
+        IPlatform::getInstance(m_ctx)->memory_free(host_ptr_);
     }
     ptr_ = nullptr;
     host_ptr_ = nullptr;
@@ -304,7 +304,7 @@ void RegionMemory::Free()
 bool RegionMemory::Freeze()
 {
     assert(this->Allocated() && nullptr != host_ptr_);
-    Umd::get(m_ctx)->memory_copy(ptr_, host_ptr_, size_, UmdMemcpyKind::HostToDevice);
+    IPlatform::getInstance(m_ctx)->memory_copy(ptr_, host_ptr_, size_, UmdMemcpyKind::HostToDevice);
 /*
     IAgent* agent = region_->owner();
     if (agent != NULL && agent->agent_type() == IAgent::kGpu) {
@@ -332,16 +332,16 @@ void* LoaderContext::SegmentAlloc(amdgpu_hsa_elf_segment_t segment,
     switch (segment) {
     case AMDGPU_HSA_SEGMENT_GLOBAL_AGENT:
     case AMDGPU_HSA_SEGMENT_READONLY_AGENT: {
-        mem = new (std::nothrow) RegionMemory(Umd::get(m_ctx)->get_device_memregion(agent), m_ctx);
+        mem = new (std::nothrow) RegionMemory(IPlatform::getInstance(m_ctx)->get_device_memregion(agent), m_ctx);
         break;
     }
     case AMDGPU_HSA_SEGMENT_GLOBAL_PROGRAM: {
-        mem = new (std::nothrow) RegionMemory(Umd::get(m_ctx)->get_system_memregion(), m_ctx);
+        mem = new (std::nothrow) RegionMemory(IPlatform::getInstance(m_ctx)->get_system_memregion(), m_ctx);
         break;
     }
     case AMDGPU_HSA_SEGMENT_CODE_AGENT: {
         profile_t agent_profile;
-        mem = new (std::nothrow) RegionMemory(IsDebuggerRegistered() ? Umd::get(m_ctx)->get_system_memregion() : Umd::get(m_ctx)->get_device_memregion(agent), m_ctx);
+        mem = new (std::nothrow) RegionMemory(IsDebuggerRegistered() ? IPlatform::getInstance(m_ctx)->get_system_memregion() : IPlatform::getInstance(m_ctx)->get_device_memregion(agent), m_ctx);
         /*
         if (SUCCESS != hsa_agent_get_info(agent, HSA_AGENT_INFO_PROFILE, &agent_profile)) {
             return nullptr;

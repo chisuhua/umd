@@ -76,7 +76,7 @@ loader::Executable* load_executable(const std::string& file,
     return executable;
 }
 
-loader::Executable* LoadProgram(const std::string& file, CUctx* ctx, IAgent* agent ) {
+loader::Executable* LoadProgram(const std::string& file, IContext* ctx, IAgent* agent ) {
     static Program* program_loader = nullptr;
     if (program_loader == nullptr) {
        program_loader = new Program(ctx);

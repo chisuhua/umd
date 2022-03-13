@@ -2,20 +2,31 @@
 #include "status.h"
 #include "common.h"
 #include <cstddef>
+#include <string>
 
 class IMemRegion;
 class IAgent;
-class CUctx;
+class IContext;
+class DispatchInfo;
 
+namespace loader {
+    class Executable;
+}
+typedef void* exec_handle_t;
 
 class IPlatform {
 public:
-    IPlatform() {};
-    ~IPlatform() {};
+    IPlatform(std::string name, IContext* ctx)
+        : name_(name)
+        , ctx_(ctx)
+    {};
+    virtual ~IPlatform() {};
 
-    CUctx *m_ctx;
+    IContext *ctx_;
+    std::string name_;
 
-    void setCtx(CUctx *ctx) { m_ctx = ctx;}
+    // void setCtx(ctx_t *ctx) { ctx_ = ctx;}
+    static IPlatform* getInstance(IContext *ctx);
 
     virtual status_t memory_register(void* address, size_t size) = 0;
     virtual status_t memory_deregister(void* address, size_t size) = 0;
@@ -27,7 +38,29 @@ public:
     virtual status_t getDeviceProperties(void* prop, int id = 0) {};
     virtual status_t getDevice(int* device) {};
 
+    exec_handle_t load_program(const std::string& file);
+    void set_kernel_disp(const std::string& kernel_name,
+            exec_handle_t exec,
+            DispatchInfo** disp_info,
+            unsigned int gridDimX,
+            unsigned int gridDimY,
+            unsigned int gridDimZ,
+            unsigned int blockDimX,
+            unsigned int blockDimY,
+            unsigned int blockDimZ,
+            uint64_t param_addr);
+
+
     virtual IMemRegion* get_system_memregion() = 0;
     virtual IMemRegion* get_device_memregion(IAgent* agent) = 0;
     virtual status_t free_memregion(IMemRegion *region) = 0;
+
+    template<typename... Args>
+    status_t launchKernel(Args... args) {
+        if (this->name_ == "UmdCuda") {
+            this->launchKernel(std::forward<Args>(args)...);
+        }
+    }
+
+
 };

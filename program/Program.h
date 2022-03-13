@@ -6,7 +6,7 @@
 #include "loader/LoaderContext.h"
 #include "loader/Loader.h"
 // #include "util/utils.h"
-class CUctx;
+class IContext;
 
 class Program {
 public:
@@ -18,7 +18,7 @@ public:
 
     // code::CodeObjectManager* code_manager() { return &code_manager_; }
 
-    Program(CUctx* ctx)
+    Program(IContext* ctx)
     {
         loader_context_ = new LoaderContext(ctx);
         loader_ = loader::Loader::Create(loader_context_);
@@ -57,4 +57,4 @@ protected:
     std::atomic<uint32_t> ref_count_;
 };
 
-loader::Executable* LoadProgram(const std::string& file, CUctx* ctx, IAgent* agent = nullptr) ;
+loader::Executable* LoadProgram(const std::string& file, IContext* ctx, IAgent* agent = nullptr) ;
