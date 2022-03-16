@@ -13,10 +13,14 @@ using namespace libcuda;
 
 extern "C" IPlatform* create_platform(IContext* ctx) {
     static std::unordered_map<std::string, IPlatform*> platform_instance;
-    if (platform_instance.count(typeid(*ctx).name()) == 0) {
-        platform_instance[typeid(*ctx).name()] = new plat_libgem5cuda(typeid(*ctx).name(), dynamic_cast<drv::CUctx*>(ctx));
+    std::string instance_name = "default";
+    if (ctx != nullptr) {
+        instance_name = typeid(*ctx).name();
     }
-    return platform_instance[typeid(*ctx).name()];
+    if (platform_instance.count(instance_name) == 0) {
+        platform_instance[instance_name] = new plat_libgem5cuda(instance_name, dynamic_cast<drv::CUctx*>(ctx));
+    }
+    return platform_instance[instance_name];
 };
 
 

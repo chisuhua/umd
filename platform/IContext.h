@@ -3,18 +3,33 @@
 #include <string>
 
 class IAgent;
+
+static std::string platform_name () {
+    std::string name;
+    char *buff = getenv("UMD");
+    if (buff) {
+        name = buff;
+    } else {
+        name = "platlibcuda";
+    }
+    return name;
+};
+
 class IContext {
 public:
-  std::string& getPlatformName() {
-      if (name_ == "") {
-        char *buff = getenv("UMD");
-        if (buff) {
-            name_ = buff;
-        } else {
-            name_ = "platlibcuda";
-        }
-      }
-      return name_;
+  static std::string platformName(IContext *ctx) {
+    if (ctx == nullptr) {
+      return platform_name();
+    } else {
+      return ctx->getPlatformName();
+    }
+  }
+
+  std::string getPlatformName() {
+    if (name_ == "") {
+      name_ = platform_name();
+    }
+    return name_;
   }
 
   void setPlatformName(std::string name) {

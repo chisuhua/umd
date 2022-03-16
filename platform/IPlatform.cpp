@@ -16,7 +16,9 @@ typedef IPlatform* (*pfn_create_platform)(IContext*);
 static std::unordered_map<std::string, pfn_create_platform> g_platform_creator;
 
 IPlatform* IPlatform::getInstance(IContext *ctx) {
-    std::string platform_name = ctx->getPlatformName();
+    std::string platform_name;
+    platform_name = IContext::platformName(ctx);
+
     if (g_platform_creator.count(platform_name) == 0)  {
         std::string umd_libname = "lib";
         umd_libname += platform_name;
