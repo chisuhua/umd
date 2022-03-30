@@ -3,6 +3,8 @@
 #include "common.h"
 #include <cstddef>
 #include <string>
+#include "libcuda/interface.h"
+#include "libgem5cuda/interface.h"
 
 class IMemRegion;
 class IAgent;
@@ -24,6 +26,8 @@ public:
 
     IContext *ctx_;
     std::string name_;
+    void* handle_;
+    bool initialized {false};
 
     // void setCtx(ctx_t *ctx) { ctx_ = ctx;}
     static IPlatform* getInstance(IContext *ctx);
@@ -55,12 +59,35 @@ public:
     virtual IMemRegion* get_device_memregion(IAgent* agent) = 0;
     virtual status_t free_memregion(IMemRegion *region) = 0;
 
+    void* pLaunchKernel = nullptr;
+    void* pSetupArgument = nullptr;
+    void* pSetupPtxSimArgument = nullptr;
+
     template<typename... Args>
-    status_t launchKernel(Args... args) {
-        if (this->name_ == "UmdCuda") {
-            this->launchKernel(std::forward<Args>(args)...);
+    status_t launchKernel(Args&&... args) {
+        if (ctx_->umd_mode <= 1) {
+            (*reinterpret_cast<pfn_libcuda_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
+        } else if (ctx_->umd_mode == 2) {
+            (*reinterpret_cast<pfn_libgem5cuda_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
         }
     }
 
+    template<typename... Args>
+    status_t setupKernelArgument(Args&&... args) {
+        if (ctx_->umd_mode <= 1) {
+            (*reinterpret_cast<pfn_libcuda_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
+        } else if (ctx_->umd_mode == 2) {
+            (*reinterpret_cast<pfn_libgem5cuda_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
+        }
+    }
+
+    template<typename... Args>
+    status_t setupPtxSimArgument(Args&&... args) {
+        if (ctx_->umd_mode <= 1) {
+            (*reinterpret_cast<pfn_libcuda_setupPtxSimArgument>(pSetupPtxSimArgument))(this, std::forward<Args>(args)...);
+        } else if (ctx_->umd_mode == 2) {
+            (*reinterpret_cast<pfn_libgem5cuda_setupPtxSimArgument>(pSetupPtxSimArgument))(this, std::forward<Args>(args)...);
+        }
+    }
 
 };

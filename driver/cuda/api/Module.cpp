@@ -3,12 +3,15 @@
 #include "platform/IPlatform.h"
 #include "driver_types.h"
 
-static drv::CUctx *g_ctx;
+static drv::Context *g_ctx;
+namespace libcuda {
+struct function_info;
+}
 
 namespace drv {
 
 CUresult CUDAAPI setDefaultCtx(::CUctx *ctx) {
-    g_ctx = new drv::CUctx(ctx);
+    g_ctx = new drv::Context(ctx);
 }
 
 CUresult CUDAAPI getDeviceCount(int* count) {
@@ -56,28 +59,23 @@ void set_kernel_disp(const std::string& kernel_name, exec_handle_t exec, Dispatc
             param_addr);
 }
 
-CUresult CUDAAPI LaunchKernel(const char* f,
-                                unsigned int gridDimX,
-                                unsigned int gridDimY,
-                                unsigned int gridDimZ,
-                                unsigned int blockDimX,
-                                unsigned int blockDimY,
-                                unsigned int blockDimZ,
-                                unsigned int sharedMemBytes,
-                                CUstream hStream,
-                                void **kernelParams,
-                                void **extra)
+CUresult CUDAAPI launchKernel(const char* f)
 {
-    IPlatform::getInstance(g_ctx)->launchKernel(
-                                gridDimX,
-                                gridDimY,
-                                gridDimZ,
-                                blockDimX,
-                                blockDimY,
-                                blockDimZ,
-                                sharedMemBytes,
-                                hStream,
-                                kernelParams,
-                                extra);
+    IPlatform::getInstance(g_ctx)->launchKernel(f);
 }
+
+CUresult setupKernelArgument(const void *arg, size_t size, size_t offset) {
+    IPlatform::getInstance(g_ctx)->setupKernelArgument(
+                                arg,
+                                size,
+                                offset);
+}
+
+CUresult setupPtxSimArgument(libcuda::function_info *finfo, const void** arg) {
+    IPlatform::getInstance(g_ctx)->setupPtxSimArgument(
+                                (void*)finfo,
+                                arg);
+}
+
+
 }

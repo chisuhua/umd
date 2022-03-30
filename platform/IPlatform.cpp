@@ -13,19 +13,24 @@ class IMemRegion;
 class IAgent;
 
 typedef IPlatform* (*pfn_create_platform)(IContext*);
+
 static std::unordered_map<std::string, pfn_create_platform> g_platform_creator;
+static std::unordered_map<std::string, void*> g_launch_kernel;
+static std::unordered_map<std::string, void*> g_setup_argument;
+static std::unordered_map<std::string, void*> g_setup_ptxsim_arg;
 
 IPlatform* IPlatform::getInstance(IContext *ctx) {
     std::string platform_name;
     platform_name = IContext::platformName(ctx);
 
+    static void* handle;
     if (g_platform_creator.count(platform_name) == 0)  {
         std::string umd_libname = "lib";
         umd_libname += platform_name;
         umd_libname += ".so";
 
         pfn_create_platform creator = nullptr;
-        void* handle = dlopen(umd_libname.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+        handle = dlopen(umd_libname.c_str(), RTLD_LAZY | RTLD_GLOBAL);
         if (handle == nullptr) {
             printf("dlopen error - %s\n", dlerror());
             assert(false);
@@ -36,9 +41,44 @@ IPlatform* IPlatform::getInstance(IContext *ctx) {
             assert(false);
         }
         g_platform_creator[platform_name] = creator;
+
     }
 
-    return (*g_platform_creator[platform_name])(ctx);
+    IPlatform* instance = (*g_platform_creator[platform_name])(ctx);
+    if (instance->initialized == false) {
+        if (ctx->umd_mode <= 1) {
+            if (g_launch_kernel.count(platform_name) == 0)  {
+                pfn_libcuda_launchKernel launchKernel = nullptr;
+                pfn_libcuda_setupArgument setupArgument = nullptr;
+                pfn_libcuda_setupPtxSimArgument setupPtxSimArgument = nullptr;
+                launchKernel = (pfn_libcuda_launchKernel)dlsym(handle, "libcuda_launchKernel");
+                setupArgument = (pfn_libcuda_setupArgument)dlsym(handle, "libcuda_setupKernelArgument");
+                setupPtxSimArgument = (pfn_libcuda_setupPtxSimArgument)dlsym(handle, "libcuda_setupPtxSimArgument");
+                g_launch_kernel[platform_name] = (void*)launchKernel;
+                g_setup_argument[platform_name] = (void*)setupArgument;
+                g_setup_ptxsim_arg[platform_name] = (void*)setupPtxSimArgument;
+            }
+        } else if (ctx->umd_mode == 2) {
+            if (g_launch_kernel.count(platform_name) == 0)  {
+                pfn_libgem5cuda_launchKernel launchKernel = nullptr;
+                pfn_libgem5cuda_setupArgument setupArgument = nullptr;
+                pfn_libgem5cuda_setupPtxSimArgument setupPtxSimArgument = nullptr;
+                launchKernel = (pfn_libgem5cuda_launchKernel)dlsym(handle, "libgem5cuda_launchKernel");
+                setupArgument = (pfn_libgem5cuda_setupArgument)dlsym(handle, "libgem5cuda_setupKernelArgument");
+                setupPtxSimArgument = (pfn_libgem5cuda_setupPtxSimArgument)dlsym(handle, "libgem5cuda_setupPtxSimArgument");
+                g_launch_kernel[platform_name] = (void*)launchKernel;
+                g_setup_argument[platform_name] = (void*)setupArgument;
+                g_setup_ptxsim_arg[platform_name] = (void*)setupPtxSimArgument;
+            }
+        }
+
+        instance->pLaunchKernel = g_launch_kernel[platform_name];
+        instance->pSetupArgument = g_setup_argument[platform_name];
+        instance->pSetupPtxSimArgument = g_setup_ptxsim_arg[platform_name];
+        instance->initialized = true;
+    }
+
+    return instance;
 };
 
 exec_handle_t IPlatform::load_program(const std::string& file) {

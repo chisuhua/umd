@@ -102,7 +102,8 @@ umd = shared_library(
   include_directories : include_directories(umd_inc),
   install : false,
   cpp_args : extra_cpp_args,
-  link_args : umd_link_args,
+  #link_args : umd_link_args + ['-lplatlibcuda', '-lplatlibgem5cuda'],
+  link_args : umd_link_args
   )
 
 platlibcuda_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']

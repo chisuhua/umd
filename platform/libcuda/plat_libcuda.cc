@@ -11,10 +11,13 @@ using namespace libcuda;
 
 extern "C" IPlatform* create_platform(IContext* ctx) {
     static std::unordered_map<std::string, IPlatform*> platform_instance;
-    if (platform_instance.count(typeid(*ctx).name()) == 0) {
-        platform_instance[typeid(*ctx).name()] = new plat_libcuda(typeid(*ctx).name(), dynamic_cast<drv::CUctx*>(ctx));
+    std::string instance_name = "default";
+    assert (ctx != nullptr) ;
+    instance_name = typeid(*ctx).name();
+    if (platform_instance.count(instance_name) == 0) {
+        platform_instance[instance_name] = new plat_libcuda(instance_name, dynamic_cast<drv::Context*>(ctx));
     }
-    return platform_instance[typeid(*ctx).name()];
+    return platform_instance[instance_name];
 };
 
 
@@ -93,4 +96,12 @@ IMemRegion* plat_libcuda::get_device_memregion(IAgent* agent) {
 
 status_t plat_libcuda::free_memregion(IMemRegion *region) {
   return SUCCESS;
+}
+
+extern "C" {
+status_t libcuda_launchKernel(IPlatform*, const void *hostFunction) {};
+
+status_t libcuda_setupKernelArgument(IPlatform*, const void *arg, size_t size,
+                                      size_t offset) {};
+
 }

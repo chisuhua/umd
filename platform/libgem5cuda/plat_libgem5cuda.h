@@ -5,13 +5,13 @@
 
 class plat_libgem5cuda : public IPlatform {
 public:
-    plat_libgem5cuda(std::string name, drv::CUctx* ctx)
+    plat_libgem5cuda(std::string name, drv::Context* ctx)
         : IPlatform(name, ctx)
     {
         cuctx_ = ctx;
     }
     ~plat_libgem5cuda() = default;
-    drv::CUctx* cuctx_;
+    drv::Context* cuctx_;
 
     status_t memory_register(void* address, size_t size);
     status_t memory_deregister(void* address, size_t size);
@@ -27,10 +27,19 @@ public:
     IMemRegion* get_device_memregion(IAgent* agent);
     status_t free_memregion(IMemRegion *region);
 
-    status_t launchKernel(const void *hostFunction,
-                                      dim3 gridDim,
-                                      dim3 blockDim,
-                                      void** args,
-                                      size_t sharedMemBytes,
-                                      cudaStream_t stream) {}
 };
+#if 0
+    status_t launchKernel(const void *hostFunction,
+            unsigned int gridDimX,
+            unsigned int gridDimY,
+            unsigned int gridDimZ,
+            unsigned int blockDimX,
+            unsigned int blockDimY,
+            unsigned int blockDimZ,
+                                       void** args,
+                                      size_t sharedMemBytes,
+                                      cudaStream_t stream);
+
+    status_t setupKernelArgument(const void *arg, size_t size,
+                                      size_t offset);
+#endif

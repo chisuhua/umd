@@ -1,6 +1,9 @@
 libumd.so {
 global:*;
 };
-libumdcuda.so {
+libplatlibcuda.so {
+global:*;
+};
+libplatlibgem5cuda.so {
 global:*;
 };

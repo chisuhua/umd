@@ -3,9 +3,10 @@
 #include "platform/IContext.h"
 
 namespace drv {
-  class CUctx : public ::IContext {
+  class Context : public ::IContext {
     public:
-      CUctx(::CUctx* ctx) {
+      Context(::CUctx* ctx) : IContext(ctx->umd_mode)
+      {
         real_ = ctx;
         // this->setPlatformName("platlibcuda");
       }

@@ -18,7 +18,7 @@ extern "C" IPlatform* create_platform(IContext* ctx) {
         instance_name = typeid(*ctx).name();
     }
     if (platform_instance.count(instance_name) == 0) {
-        platform_instance[instance_name] = new plat_libgem5cuda(instance_name, dynamic_cast<drv::CUctx*>(ctx));
+        platform_instance[instance_name] = new plat_libgem5cuda(instance_name, dynamic_cast<drv::Context*>(ctx));
     }
     return platform_instance[instance_name];
 };
@@ -110,5 +110,34 @@ status_t plat_libgem5cuda::getDevice(int* device) {
   gem5cudaGetDevice(device);
   return SUCCESS;
 };
+
+extern "C" {
+status_t libgem5cuda_launchKernel(IPlatform*, const void *hostFun/*,
+            unsigned int gridDimX,
+            unsigned int gridDimY,
+            unsigned int gridDimZ,
+            unsigned int blockDimX,
+            unsigned int blockDimY,
+            unsigned int blockDimZ,
+                                       void** args,
+                                      size_t sharedMemBytes,
+                                      void** stream*/) {
+  //dim3 gridDim(gridDimX, gridDimY, gridDimZ);
+  //dim3 blockDim(blockDimX, blockDimY, blockDimZ);
+  //gem5cudaConfigureCall(gridDim, blockDim, sharedMemBytes, (cudaStream_t)stream);
+  gem5cudaLaunch((const char*)hostFun);
+}
+
+status_t libgem5cuda_setupKernelArgument(IPlatform*, const void *arg, size_t size,
+                                      size_t offset) {
+  gem5cudaSetupArgument(arg, size, offset);
+}
+
+status_t libgem5cuda_setupPtxSimArgument(IPlatform*, void *finfo, const void **arg) {
+  assert(false);
+  // gem5cudaSetupPtxSimArgument((function_info*)finfo, arg);
+}
+
+}
 
 

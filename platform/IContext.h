@@ -4,6 +4,7 @@
 
 class IAgent;
 
+#if 0
 static std::string platform_name () {
     std::string name;
     char *buff = getenv("UMD");
@@ -14,20 +15,37 @@ static std::string platform_name () {
     }
     return name;
 };
+#endif
 
 class IContext {
 public:
+  IContext(int umd_mode) : umd_mode(umd_mode)
+  {}
+
   static std::string platformName(IContext *ctx) {
+    assert(ctx != nullptr);
+    return ctx->getPlatformName();
+/*
     if (ctx == nullptr) {
       return platform_name();
     } else {
       return ctx->getPlatformName();
     }
+*/
   }
 
   std::string getPlatformName() {
     if (name_ == "") {
+      if (umd_mode <= 1) {
+          name_ = "platlibcuda";
+      } else if (umd_mode == 2) {
+          name_ = "platlibgem5cuda";
+      } else {
+         assert (false || "umd > 1");
+      }
+      /*
       name_ = platform_name();
+      */
     }
     return name_;
   }
@@ -48,7 +66,8 @@ public:
   void set_agent(IAgent* agent) {
     m_agent = agent;
   }
-
+public:
+  int umd_mode;
   IAgent* m_agent;
   std::string name_ {""};
 };
