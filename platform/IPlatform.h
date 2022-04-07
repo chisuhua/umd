@@ -5,10 +5,11 @@
 #include <string>
 #include "libcuda/interface.h"
 #include "libgem5cuda/interface.h"
+#include "IContext.h"
 
 class IMemRegion;
 class IAgent;
-class IContext;
+// class IContext;
 class DispatchInfo;
 
 namespace loader {
