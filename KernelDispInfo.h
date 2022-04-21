@@ -3,7 +3,8 @@
 #define SHADER_ABI_USER_DATA_REGISTER_NUM_MAX 32
 #include <stdint.h>
 
-
+// FIXME it need to changed acording to kernel_ctrl
+#if 0
 union SHADER_ABI_KERNEL_CONTROL {
     struct {
         uint16_t    grid_dim_x_en       : 1;
@@ -20,6 +21,7 @@ union SHADER_ABI_KERNEL_CONTROL {
     } bits;
     uint16_t    val;
 };
+#endif
 
 union SHADER_ABI_KERNEL_MODE {
     struct {
@@ -63,8 +65,11 @@ union SHADER_ABI_THREADBLOCK_DIM {
 
 struct DispatchInfo {
     uint64_t    kernel_prog_addr;
-    uint64_t    kernel_param_addr;
     uint64_t    kernel_name_addr;
+    uint64_t    kernel_param_addr;
+    uint64_t    kernel_param_size;
+    uint64_t    local_mem_addr;
+    uint64_t    local_mem_size;
     uint64_t    start_pC;
     uint32_t    grid_dim_x;
     uint32_t    grid_dim_y;
@@ -75,7 +80,8 @@ struct DispatchInfo {
     uint16_t    block_dim_x;
     uint16_t    block_dim_y;
     uint16_t    block_dim_z;
-    SHADER_ABI_KERNEL_CONTROL kernel_ctrl;
+    // SHADER_ABI_KERNEL_CONTROL kernel_ctrl;
+    uint32_t    kernel_ctrl;
     SHADER_ABI_KERNEL_MODE    kernel_mode;
     SHADER_ABI_KERNEL_RESOURCE  kernel_resource;
     // SHADER_ABI_THREADBLOCK_DIM block_dim;
