@@ -68,8 +68,7 @@ struct DispatchInfo {
     uint64_t    kernel_name_addr;
     uint64_t    kernel_param_addr;
     uint64_t    kernel_param_size;
-    uint64_t    local_mem_addr;
-    uint64_t    local_mem_size;
+    uint64_t    private_mem_addr;
     uint64_t    start_pC;
     uint32_t    grid_dim_x;
     uint32_t    grid_dim_y;
@@ -86,8 +85,9 @@ struct DispatchInfo {
     SHADER_ABI_KERNEL_RESOURCE  kernel_resource;
     // SHADER_ABI_THREADBLOCK_DIM block_dim;
     uint32_t    userSreg[SHADER_ABI_USER_DATA_REGISTER_NUM_MAX];
-    int lmem;
-    int smem;
+    uint32_t    shared_memsize;
+    uint32_t    private_memsize;
+    uint32_t    bar_used;
     int cmem;
     int gmem;
     int regs;

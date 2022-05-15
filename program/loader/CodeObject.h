@@ -156,11 +156,12 @@ struct KernelMeta {
     std::string symbol;
     int max_flat_workgroup_size;
     int kernarg_segment_size;
-    int private_segment_fixed_size;
+    int shared_memsize;
+    int private_memsize;
+    int bar_used;
     int wavefront_size;
     std::string language; // OpenCL C
     int kernarg_segment_align;
-    int group_segment_fixed_size;
     int kernel_ctrl { 0 };
     int kernel_mode { 0 };
 };
@@ -504,8 +505,8 @@ public:
 class KernelSymbolV3 : public SymbolV3 {
 public:
     uint32_t kernarg_segment_size, kernarg_segment_alignment;
-    uint32_t group_segment_size, private_segment_size;
-    uint32_t kernel_ctrl, kernel_mode;
+    uint32_t shared_memsize, private_memsize;
+    uint32_t bar_used, kernel_ctrl, kernel_mode;
     bool is_dynamic_callstack;
 
 public:

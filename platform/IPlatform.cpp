@@ -102,6 +102,9 @@ void IPlatform::set_kernel_disp(const std::string& kernel_name,
     sym->GetInfo(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_OBJECT, (void*)&dinfo->kernel_prog_addr);
     sym->GetInfo(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_CTRL, (void*)&dinfo->kernel_ctrl);
     sym->GetInfo(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_MODE, (void*)&dinfo->kernel_mode);
+    sym->GetInfo(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_GROUP_SEGMENT_SIZE, (void*)&dinfo->shared_memsize);
+    sym->GetInfo(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_PRIVATE_SEGMENT_SIZE, (void*)&dinfo->private_memsize);
+    sym->GetInfo(HSA_CODE_SYMBOL_INFO_KERNEL_BAR_USED, (void*)&dinfo->bar_used);
     dinfo->grid_dim_x = gridDimX;
     dinfo->grid_dim_y = gridDimY;
     dinfo->grid_dim_z = gridDimZ;

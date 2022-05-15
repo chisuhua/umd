@@ -103,8 +103,9 @@ public:
         const bool& _is_definition,
         const uint32_t& _kernarg_segment_size,
         const uint32_t& _kernarg_segment_alignment,
-        const uint32_t& _group_segment_size,
-        const uint32_t& _private_segment_size,
+        const uint32_t& _shared_memsize,
+        const uint32_t& _private_memsize,
+        const uint32_t& _bar_used,
         const uint32_t& _kernel_ctrl,
         const uint32_t& _kernel_mode,
         const bool& _is_dynamic_callstack,
@@ -121,8 +122,9 @@ public:
         , full_name(_module_name.empty() ? _symbol_name : _module_name + "::" + _symbol_name)
         , kernarg_segment_size(_kernarg_segment_size)
         , kernarg_segment_alignment(_kernarg_segment_alignment)
-        , group_segment_size(_group_segment_size)
-        , private_segment_size(_private_segment_size)
+        , shared_memsize(_shared_memsize)
+        , private_memsize(_private_memsize)
+        , bar_used(_bar_used)
         , kernel_ctrl(_kernel_ctrl)
         , kernel_mode(_kernel_mode)
         , is_dynamic_callstack(_is_dynamic_callstack)
@@ -138,8 +140,9 @@ public:
     std::string full_name;
     uint32_t kernarg_segment_size;
     uint32_t kernarg_segment_alignment;
-    uint32_t group_segment_size;
-    uint32_t private_segment_size;
+    uint32_t shared_memsize;
+    uint32_t private_memsize;
+    uint32_t bar_used;
     uint32_t kernel_ctrl;
     uint32_t kernel_mode;
     bool is_dynamic_callstack;

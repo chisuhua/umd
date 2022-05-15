@@ -146,13 +146,13 @@ namespace code {
         return reinterpret_cast<Symbol*>(s.handle);
     }
 
-
     KernelSymbol::KernelSymbol(elf::Symbol* elfsym_, const kernel_code_t* akc)
         : Symbol(elfsym_)
         , kernarg_segment_size(0)
         , kernarg_segment_alignment(0)
-        , group_segment_size(0)
-        , private_segment_size(0)
+        , shared_memsize(0)
+        , private_memsize(0)
+        , bar_used(0)
         , is_dynamic_callstack(0)
     {
         if (akc) {
@@ -1089,8 +1089,8 @@ namespace code {
         : SymbolV3(std::move(elfsym_), elf_reader)
         , kernarg_segment_size(0)
         , kernarg_segment_alignment(0)
-        , group_segment_size(0)
-        , private_segment_size(0)
+        , shared_memsize(0)
+        , private_memsize(0)
         , is_dynamic_callstack(0)
         , kernel_ctrl(0)
         , kernel_mode(0)
@@ -1098,8 +1098,8 @@ namespace code {
         if (kmeta) {
             kernarg_segment_size = (uint32_t)kmeta->kernarg_segment_size;
             kernarg_segment_alignment = (uint32_t)(1 << kmeta->kernarg_segment_align);
-            group_segment_size = uint32_t(kmeta->group_segment_fixed_size);
-            private_segment_size = uint32_t(kmeta->private_segment_fixed_size);
+            shared_memsize = uint32_t(kmeta->shared_memsize);
+            private_memsize = uint32_t(kmeta->private_memsize);
             kernel_ctrl = uint32_t(kmeta->kernel_ctrl);
             kernel_mode = uint32_t(kmeta->kernel_mode);
             // is_dynamic_callstack = HCS_BITS_GET(akc->kernel_code_properties, AMD_KERNEL_CODE_PROPERTIES_IS_DYNAMIC_CALLSTACK) ? true : false;
@@ -1119,15 +1119,19 @@ namespace code {
             break;
         }
         case HSA_CODE_SYMBOL_INFO_KERNEL_GROUP_SEGMENT_SIZE: {
-            *((uint32_t*)value) = group_segment_size;
+            *((uint32_t*)value) = shared_memsize;
             break;
         }
         case HSA_CODE_SYMBOL_INFO_KERNEL_PRIVATE_SEGMENT_SIZE: {
-            *((uint32_t*)value) = private_segment_size;
+            *((uint32_t*)value) = private_memsize;
             break;
         }
         case HSA_CODE_SYMBOL_INFO_KERNEL_DYNAMIC_CALLSTACK: {
             *((bool*)value) = is_dynamic_callstack;
+            break;
+        }
+        case HSA_CODE_SYMBOL_INFO_KERNEL_BAR_USED: {
+            *((uint32_t*)value) = bar_used;
             break;
         }
         case HSA_CODE_SYMBOL_INFO_KERNEL_CTRL: {
@@ -1220,9 +1224,6 @@ namespace code {
                     case hash_compile_time(".kernarg_segment_size"):
                         meta.kernarg_segment_size = o.as<int>();
                         break;
-                    case hash_compile_time(".private_segment_fixed_size"):
-                        meta.private_segment_fixed_size = o.as<int>();
-                        break;
                     case hash_compile_time(".wavefront_size"):
                         meta.wavefront_size = o.as<int>();
                         break;
@@ -1232,8 +1233,14 @@ namespace code {
                     case hash_compile_time(".kernarg_segment_align"):
                         meta.kernarg_segment_align = o.as<int>();
                         break;
-                    case hash_compile_time(".group_segment_fixed_size"):
-                        meta.group_segment_fixed_size = o.as<int>();
+                    case hash_compile_time(".bar_used"):
+                        meta.bar_used = o.as<int>();
+                        break;
+                    case hash_compile_time(".shared_memsize"):
+                        meta.shared_memsize = o.as<int>();
+                        break;
+                    case hash_compile_time(".private_memsize"):
+                        meta.private_memsize = o.as<int>();
                         break;
                     case hash_compile_time(".kernel_ctrl"):
                         meta.kernel_ctrl = o.as<int>();

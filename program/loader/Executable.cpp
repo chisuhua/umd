@@ -364,11 +364,15 @@ bool KernelSymbol::GetInfo(hsa_symbol_info32_t symbol_info, void* value)
         break;
     }
     case HSA_CODE_SYMBOL_INFO_KERNEL_GROUP_SEGMENT_SIZE: {
-        *((uint32_t*)value) = group_segment_size;
+        *((uint32_t*)value) = shared_memsize;
         break;
     }
     case HSA_CODE_SYMBOL_INFO_KERNEL_PRIVATE_SEGMENT_SIZE: {
-        *((uint32_t*)value) = private_segment_size;
+        *((uint32_t*)value) = private_memsize;
+        break;
+    }
+    case HSA_CODE_SYMBOL_INFO_KERNEL_BAR_USED: {
+        *((uint32_t*)value) = bar_used;
         break;
     }
     case HSA_CODE_SYMBOL_INFO_KERNEL_CTRL: {
@@ -2071,8 +2075,9 @@ status_t ExecutableImpl::LoadDefinitionSymbol(IAgent* agent,
 
         uint32_t kernarg_segment_size = ksym->kernarg_segment_size;
         uint32_t kernarg_segment_alignment = ksym->kernarg_segment_alignment;
-        uint32_t group_segment_size = ksym->group_segment_size;
-        uint32_t private_segment_size = ksym->private_segment_size;
+        uint32_t shared_memsize = ksym->shared_memsize;
+        uint32_t private_memsize = ksym->private_memsize;
+        uint32_t bar_used = ksym->bar_used;
         bool is_dynamic_callstack = ksym->is_dynamic_callstack;
         uint32_t kernel_ctrl = ksym->kernel_ctrl;
         uint32_t kernel_mode = ksym->kernel_mode;
@@ -2091,8 +2096,9 @@ status_t ExecutableImpl::LoadDefinitionSymbol(IAgent* agent,
             true, // sym->IsDefinition()
             kernarg_segment_size,
             kernarg_segment_alignment,
-            group_segment_size,
-            private_segment_size,
+            shared_memsize,
+            private_memsize,
+            bar_used,
             kernel_ctrl,
             kernel_mode,
             is_dynamic_callstack,
