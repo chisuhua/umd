@@ -46,19 +46,7 @@ IPlatform* IPlatform::getInstance(IContext *ctx) {
 
     IPlatform* instance = (*g_platform_creator[platform_name])(ctx);
     if (instance->initialized == false) {
-        if (ctx->umd_mode <= 1) {
-            if (g_launch_kernel.count(platform_name) == 0)  {
-                pfn_libcuda_launchKernel launchKernel = nullptr;
-                pfn_libcuda_setupArgument setupArgument = nullptr;
-                pfn_libcuda_setupPtxSimArgument setupPtxSimArgument = nullptr;
-                launchKernel = (pfn_libcuda_launchKernel)dlsym(handle, "libcuda_launchKernel");
-                setupArgument = (pfn_libcuda_setupArgument)dlsym(handle, "libcuda_setupKernelArgument");
-                setupPtxSimArgument = (pfn_libcuda_setupPtxSimArgument)dlsym(handle, "libcuda_setupPtxSimArgument");
-                g_launch_kernel[platform_name] = (void*)launchKernel;
-                g_setup_argument[platform_name] = (void*)setupArgument;
-                g_setup_ptxsim_arg[platform_name] = (void*)setupPtxSimArgument;
-            }
-        } else if (ctx->umd_mode == 2) {
+        if (platform_name == "libgem5cuda") {
             if (g_launch_kernel.count(platform_name) == 0)  {
                 pfn_libgem5cuda_launchKernel launchKernel = nullptr;
                 pfn_libgem5cuda_setupArgument setupArgument = nullptr;

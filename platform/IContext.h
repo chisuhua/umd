@@ -19,7 +19,7 @@ static std::string platform_name () {
 
 class IContext {
 public:
-  IContext(int umd_mode) : umd_mode(umd_mode)
+  IContext(std::string umd_platname) : name_(umd_platname)
   {}
 
   static std::string platformName(IContext *ctx) {
@@ -35,6 +35,7 @@ public:
   }
 
   std::string getPlatformName() {
+#if 0
     if (name_ == "") {
       if (umd_mode <= 1) {
           name_ = "platlibcuda";
@@ -51,6 +52,7 @@ public:
       name_ = platform_name();
       */
     }
+#endif
     return name_;
   }
 
@@ -71,7 +73,6 @@ public:
     m_agent = agent;
   }
 public:
-  int umd_mode;
   IAgent* m_agent;
   std::string name_ {""};
 };

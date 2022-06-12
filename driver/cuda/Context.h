@@ -5,7 +5,7 @@
 namespace drv {
   class Context : public ::IContext {
     public:
-      Context(::CUctx* ctx) : IContext(ctx->umd_mode)
+      Context(::CUctx* ctx) : IContext(ctx->get_umd_name())
       {
         real_ = ctx;
         // this->setPlatformName("platlibcuda");
