@@ -40,6 +40,10 @@ public:
           name_ = "platlibcuda";
       } else if (umd_mode == 2) {
           name_ = "platlibgem5cuda";
+      } else if (umd_mode == 3) {
+          name_ = "platlibgem5umd";
+      } else if (umd_mode == 4) {
+          name_ = "platlibgem5kmd";
       } else {
          assert (false || "umd > 1");
       }

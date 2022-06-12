@@ -5,6 +5,8 @@
 #include <string>
 #include "libcuda/interface.h"
 #include "libgem5cuda/interface.h"
+#include "gem5umd/interface.h"
+#include "gem5kmd/interface.h"
 #include "IContext.h"
 
 class IMemRegion;
@@ -70,6 +72,10 @@ public:
             (*reinterpret_cast<pfn_libcuda_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
         } else if (ctx_->umd_mode == 2) {
             (*reinterpret_cast<pfn_libgem5cuda_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
+        } else if (ctx_->umd_mode == 3) {
+            (*reinterpret_cast<pfn_libgem5umd_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
+        } else if (ctx_->umd_mode == 4) {
+            (*reinterpret_cast<pfn_libgem5kmd_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
         }
     }
 
@@ -79,6 +85,10 @@ public:
             (*reinterpret_cast<pfn_libcuda_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
         } else if (ctx_->umd_mode == 2) {
             (*reinterpret_cast<pfn_libgem5cuda_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
+        } else if (ctx_->umd_mode == 3) {
+            (*reinterpret_cast<pfn_libgem5umd_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
+        } else if (ctx_->umd_mode == 4) {
+            (*reinterpret_cast<pfn_libgem5kmd_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
         }
     }
 

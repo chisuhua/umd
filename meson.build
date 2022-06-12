@@ -106,6 +106,7 @@ umd = shared_library(
   link_args : umd_link_args
   )
 
+## platform libcuda
 platlibcuda_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
 platlibcuda_inc = [
   '../3rdparty/msgpack-c/include',
@@ -127,6 +128,7 @@ platlibcuda = shared_library(
   link_args : platlibcuda_link_args,
   )
 
+## platform libgem5cuda
 platlibgem5cuda_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
 platlibgem5cuda_inc = [
   '../3rdparty/msgpack-c/include',
@@ -146,6 +148,50 @@ platlibgem5cuda = shared_library(
   install : false,
   cpp_args : extra_cpp_args,
   link_args : platlibgem5cuda_link_args,
+  )
+
+## platform libgem5cuda
+platgem5umd_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
+platgem5umd_inc = [
+  '../3rdparty/msgpack-c/include',
+  DESIGN_ROOT + '/opu/coasm',
+  DESIGN_ROOT + '/libcuda',
+  CUDA_INSTALL_PATH + '/include'
+  ]
+
+platgem5umd_src = [
+	'platform/gem5umd/plat_gem5umd.cc',
+  ]
+
+platgem5umd = shared_library(
+  'platgem5umd',
+  platgem5umd_src,
+  include_directories : include_directories(platgem5umd_inc),
+  install : false,
+  cpp_args : extra_cpp_args,
+  link_args : platgem5umd_link_args,
+  )
+
+## platform libgem5cuda
+platgem5kmd_link_args = link_args + ['-Wl,--version-script='+model_symbol_list] + ['-L' + DESIGN_ROOT + '/cosim', '-lcudart']
+platgem5kmd_inc = [
+  '../3rdparty/msgpack-c/include',
+  DESIGN_ROOT + '/opu/coasm',
+  DESIGN_ROOT + '/libcuda',
+  CUDA_INSTALL_PATH + '/include'
+  ]
+
+platgem5kmd_src = [
+	'platform/gem5kmd/plat_gem5kmd.cc',
+  ]
+
+platgem5kmd = shared_library(
+  'platgem5kmd',
+  platgem5kmd_src,
+  include_directories : include_directories(platgem5kmd_inc),
+  install : false,
+  cpp_args : extra_cpp_args,
+  link_args : platgem5kmd_link_args,
   )
 
 #test_simple_src = [
