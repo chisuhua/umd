@@ -68,22 +68,22 @@ public:
 
     template<typename... Args>
     status_t launchKernel(Args&&... args) {
-        if (ctx_->name_ == "libgem5cuda") {
+        if (ctx_->name_ == "platlibgem5cuda") {
             (*reinterpret_cast<pfn_libgem5cuda_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
-        } else if (ctx_->name_ == "gem5umd") {
+        } else if (ctx_->name_ == "platgem5umd") {
             (*reinterpret_cast<pfn_libgem5umd_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
-        } else if (ctx_->name_ == "gem5kmd") {
+        } else if (ctx_->name_ == "platgem5kmd") {
             (*reinterpret_cast<pfn_libgem5kmd_launchKernel>(pLaunchKernel))(this, std::forward<Args>(args)...);
         }
     }
 
     template<typename... Args>
     status_t setupKernelArgument(Args&&... args) {
-        if (ctx_->name_ == "libgem5cuda") {
+        if (ctx_->name_ == "platlibgem5cuda") {
             (*reinterpret_cast<pfn_libgem5cuda_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
-        } else if (ctx_->name_ == "gem5umd") {
+        } else if (ctx_->name_ == "platgem5umd") {
             (*reinterpret_cast<pfn_libgem5umd_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
-        } else if (ctx_->name_ == "gem5kmd") {
+        } else if (ctx_->name_ == "platgem5kmd") {
             (*reinterpret_cast<pfn_libgem5kmd_setupArgument>(pSetupArgument))(this, std::forward<Args>(args)...);
         }
     }
