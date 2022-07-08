@@ -112,7 +112,7 @@ status_t plat_libgem5cuda::getDevice(int* device) {
 };
 
 extern "C" {
-status_t libgem5cuda_launchKernel(IPlatform*, const void *hostFun/*,
+status_t libgem5cuda_launchKernel(IPlatform*, const void *hostFun, void* disp_info, void *stream/*,
             unsigned int gridDimX,
             unsigned int gridDimY,
             unsigned int gridDimZ,

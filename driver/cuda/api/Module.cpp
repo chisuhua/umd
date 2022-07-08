@@ -59,9 +59,9 @@ void set_kernel_disp(const std::string& kernel_name, exec_handle_t exec, Dispatc
             param_addr);
 }
 
-CUresult CUDAAPI launchKernel(const char* f)
+CUresult CUDAAPI launchKernel(const char* f, DispatchInfo* disp_info = nullptr, void *stream= nullptr)
 {
-    IPlatform::getInstance(g_ctx)->launchKernel(f);
+    IPlatform::getInstance(g_ctx)->launchKernel(f, disp_info, stream);
 }
 
 CUresult setupKernelArgument(const void *arg, size_t size, size_t offset) {

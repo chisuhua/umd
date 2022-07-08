@@ -46,7 +46,7 @@ IPlatform* IPlatform::getInstance(IContext *ctx) {
 
     IPlatform* instance = (*g_platform_creator[platform_name])(ctx);
     if (instance->initialized == false) {
-        if (platform_name == "libgem5cuda") {
+        if (platform_name == "platlibgem5cuda") {
             if (g_launch_kernel.count(platform_name) == 0)  {
                 pfn_libgem5cuda_launchKernel launchKernel = nullptr;
                 pfn_libgem5cuda_setupArgument setupArgument = nullptr;
@@ -57,6 +57,18 @@ IPlatform* IPlatform::getInstance(IContext *ctx) {
                 g_launch_kernel[platform_name] = (void*)launchKernel;
                 g_setup_argument[platform_name] = (void*)setupArgument;
                 g_setup_ptxsim_arg[platform_name] = (void*)setupPtxSimArgument;
+            }
+        } else if (platform_name == "platgem5umd") {
+            if (g_launch_kernel.count(platform_name) == 0)  {
+                pfn_libgem5umd_launchKernel launchKernel = nullptr;
+                pfn_libgem5umd_setupArgument setupArgument = nullptr;
+                pfn_libgem5umd_setupPtxSimArgument setupPtxSimArgument = nullptr;
+                launchKernel = (pfn_libgem5umd_launchKernel)dlsym(handle, "libgem5umd_launchKernel");
+                setupArgument = (pfn_libgem5umd_setupArgument)dlsym(handle, "libgem5umd_setupKernelArgument");
+                // setupPtxSimArgument = (pfn_libgem5umd_setupPtxSimArgument)dlsym(handle, "libgem5umd_setupPtxSimArgument");
+                g_launch_kernel[platform_name] = (void*)launchKernel;
+                g_setup_argument[platform_name] = (void*)setupArgument;
+                // g_setup_ptxsim_arg[platform_name] = (void*)setupPtxSimArgument;
             }
         }
 

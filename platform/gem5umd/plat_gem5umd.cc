@@ -112,7 +112,7 @@ status_t plat_libgem5umd::getDevice(int* device) {
 };
 
 extern "C" {
-status_t libgem5umd_launchKernel(IPlatform*, const void *hostFun/*,
+status_t libgem5umd_launchKernel(IPlatform*, const void *hostFun, void* disp_info, void *stream/*,
             unsigned int gridDimX,
             unsigned int gridDimY,
             unsigned int gridDimZ,
@@ -125,7 +125,7 @@ status_t libgem5umd_launchKernel(IPlatform*, const void *hostFun/*,
   //dim3 gridDim(gridDimX, gridDimY, gridDimZ);
   //dim3 blockDim(blockDimX, blockDimY, blockDimZ);
   //gem5cudaConfigureCall(gridDim, blockDim, sharedMemBytes, (cudaStream_t)stream);
-  gem5umdLaunch((const char*)hostFun);
+  gem5umdLaunch((const char*)hostFun, disp_info, stream);
 }
 
 status_t libgem5umd_setupKernelArgument(IPlatform*, const void *arg, size_t size,

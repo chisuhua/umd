@@ -3,7 +3,7 @@ class IPlatform;
 
 extern "C" {
 
-typedef status_t (*pfn_libgem5kmd_launchKernel)(IPlatform*, const void *hostFunction/*,
+typedef status_t (*pfn_libgem5kmd_launchKernel)(IPlatform*, const void *hostFunction, void* disp_info, void *stream/*
             unsigned int gridDimX,
             unsigned int gridDimY,
             unsigned int gridDimZ,
