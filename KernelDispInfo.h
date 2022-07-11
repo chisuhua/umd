@@ -90,8 +90,8 @@ struct DispatchInfo {
     uint32_t    bar_used;
     int cmem;
     int gmem;
-    int vregs;
-    int sregs;
+    int vreg_used;
+    int sreg_used;
 };
 
 

@@ -106,6 +106,7 @@ public:
         const uint32_t& _shared_memsize,
         const uint32_t& _private_memsize,
         const uint32_t& _bar_used,
+        const uint32_t& _vreg_used,
         const uint32_t& _kernel_ctrl,
         const uint32_t& _kernel_mode,
         const bool& _is_dynamic_callstack,
@@ -125,6 +126,7 @@ public:
         , shared_memsize(_shared_memsize)
         , private_memsize(_private_memsize)
         , bar_used(_bar_used)
+        , vreg_used(_vreg_used)
         , kernel_ctrl(_kernel_ctrl)
         , kernel_mode(_kernel_mode)
         , is_dynamic_callstack(_is_dynamic_callstack)
@@ -143,6 +145,7 @@ public:
     uint32_t shared_memsize;
     uint32_t private_memsize;
     uint32_t bar_used;
+    uint32_t vreg_used;
     uint32_t kernel_ctrl;
     uint32_t kernel_mode;
     bool is_dynamic_callstack;

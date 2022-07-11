@@ -375,6 +375,10 @@ bool KernelSymbol::GetInfo(hsa_symbol_info32_t symbol_info, void* value)
         *((uint32_t*)value) = bar_used;
         break;
     }
+    case HSA_CODE_SYMBOL_INFO_KERNEL_VREG_USED: {
+        *((uint32_t*)value) = vreg_used;
+        break;
+    }
     case HSA_CODE_SYMBOL_INFO_KERNEL_CTRL: {
         *((uint32_t*)value) = kernel_ctrl;
         break;
@@ -2078,6 +2082,7 @@ status_t ExecutableImpl::LoadDefinitionSymbol(IAgent* agent,
         uint32_t shared_memsize = ksym->shared_memsize;
         uint32_t private_memsize = ksym->private_memsize;
         uint32_t bar_used = ksym->bar_used;
+        uint32_t vreg_used = ksym->vreg_used;
         bool is_dynamic_callstack = ksym->is_dynamic_callstack;
         uint32_t kernel_ctrl = ksym->kernel_ctrl;
         uint32_t kernel_mode = ksym->kernel_mode;
@@ -2099,6 +2104,7 @@ status_t ExecutableImpl::LoadDefinitionSymbol(IAgent* agent,
             shared_memsize,
             private_memsize,
             bar_used,
+            vreg_used,
             kernel_ctrl,
             kernel_mode,
             is_dynamic_callstack,

@@ -153,6 +153,7 @@ namespace code {
         , shared_memsize(0)
         , private_memsize(0)
         , bar_used(0)
+        , vreg_used(0)
         , is_dynamic_callstack(0)
     {
         if (akc) {
@@ -1134,6 +1135,10 @@ namespace code {
             *((uint32_t*)value) = bar_used;
             break;
         }
+        case HSA_CODE_SYMBOL_INFO_KERNEL_VREG_USED: {
+            *((uint32_t*)value) = vreg_used;
+            break;
+        }
         case HSA_CODE_SYMBOL_INFO_KERNEL_CTRL: {
             *((uint32_t*)value) = kernel_ctrl;
             break;
@@ -1235,6 +1240,9 @@ namespace code {
                         break;
                     case hash_compile_time(".bar_used"):
                         meta.bar_used = o.as<int>();
+                        break;
+                    case hash_compile_time(".vreg_used"):
+                        meta.vreg_used = o.as<int>();
                         break;
                     case hash_compile_time(".shared_memsize"):
                         meta.shared_memsize = o.as<int>();

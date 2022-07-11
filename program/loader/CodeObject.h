@@ -159,6 +159,7 @@ struct KernelMeta {
     int shared_memsize;
     int private_memsize;
     int bar_used;
+    int vreg_used;
     int wavefront_size;
     std::string language; // OpenCL C
     int kernarg_segment_align;
@@ -506,7 +507,7 @@ class KernelSymbolV3 : public SymbolV3 {
 public:
     uint32_t kernarg_segment_size, kernarg_segment_alignment;
     uint32_t shared_memsize, private_memsize;
-    uint32_t bar_used, kernel_ctrl, kernel_mode;
+    uint32_t bar_used, vreg_used, kernel_ctrl, kernel_mode;
     bool is_dynamic_callstack;
 
 public:
