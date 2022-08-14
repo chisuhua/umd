@@ -1103,6 +1103,8 @@ namespace code {
             private_memsize = uint32_t(kmeta->private_memsize);
             kernel_ctrl = uint32_t(kmeta->kernel_ctrl);
             kernel_mode = uint32_t(kmeta->kernel_mode);
+            bar_used = uint32_t(kmeta->bar_used);
+            vreg_used = uint32_t(kmeta->vreg_used);
             // is_dynamic_callstack = HCS_BITS_GET(akc->kernel_code_properties, AMD_KERNEL_CODE_PROPERTIES_IS_DYNAMIC_CALLSTACK) ? true : false;
         }
     }
